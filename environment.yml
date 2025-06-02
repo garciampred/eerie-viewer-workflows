@@ -1,0 +1,34 @@
+# environment.yml: Mandatory dependencies only.
+channels:
+- conda-forge
+- nodefaults
+# EXAMPLE:
+# dependencies:
+# - package1
+# - package2
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW AS SHOWN IN THE EXAMPLE
+dependencies:
+- python=3.12
+- zarr
+- intake
+- intake-esm
+- intake-xarray
+- python-eccodes=1.7.1
+- eccodes=2.36.0
+- xarray<2025.03
+- aiohttp
+- scipy
+- cfgrib
+- dask
+- geopandas
+- regionmask
+- s3fs
+- boto3<1.36
+- botocore<1.36
+- numba
+- fastparquet
+- python-dotenv
+- xarray-regrid
+- pip:
+  - gribscan==0.0.13
+  - numba-stats

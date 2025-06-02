@@ -1,0 +1,173 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": 1, "Name": "California EBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-170, 30],
+          [-110, 30],
+          [-110, 65],
+          [-170, 65],
+          [-170, 30]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 2, "Name": "peru/chile EBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-110, -40],
+          [-70, -40],
+          [-70, -15],
+          [-110, -15],
+          [-110, -40]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 3, "Name": "australia EBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [90, -40],
+          [140, -40],
+          [140, -25],
+          [90, -25],
+          [90, -40]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 4, "Name": "N Africa EBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-40, 15],
+          [-5, 15],
+          [-5, 35],
+          [-40, 35],
+          [-40, 15]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 5, "Name": "S Africa EBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0, -40],
+          [25, -40],
+          [25, -15],
+          [0, -15],
+          [0, -40]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 6, "Name": "Gulf stream" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-80, 25],
+          [-40, 25],
+          [-40, 60],
+          [-80, 60],
+          [-80, 25]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 7, "Name": "South America WBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-60, -40],
+          [-25, -40],
+          [-25, -15],
+          [-60, -15],
+          [-60, -40]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 8, "Name": "Kuroshiro" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110, 25],
+          [170, 25],
+          [170, 60],
+          [110, 60],
+          [110, 25]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 9, "Name": "Australia WBC" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [140, -40],
+          [180, -40],
+          [180, -15],
+          [140, -15],
+          [140, -40]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 10, "Name": "Tropical belt" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-180, -15],
+          [180, -15],
+          [180, 15],
+          [-180, 15],
+          [-180, -15]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 11, "Name": "Southern Ocean" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-180, -55],
+          [180, -55],
+          [180, -40],
+          [-180, -40],
+          [-180, -55]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 12, "Name": "North Atlantic" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-40, 50],
+          [20, 50],
+          [20, 75],
+          [-40, 75],
+          [-40, 50]
+        ]]
+      }
+    }
+  ]
+}

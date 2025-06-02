@@ -1,0 +1,2 @@
+class EmptySliceError(RuntimeError):
+    pass
