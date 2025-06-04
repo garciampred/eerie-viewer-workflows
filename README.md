@@ -22,7 +22,7 @@ The following is a schematic description of the main workflow:
 - Merge all the products into a single dataset and save it to netCDF using dask.
 - A separate script converts the netCDFs to zarr and uploads it to the storage, defining the chunks so there is a single chunk for each map or time series.
 
-## Instalation
+## Instalation and configuration
 
 It is recommended to clone the project and create a conda environment with the environment.yml file. Then
 the project root can be simply added to the PYTHONPATH.
@@ -35,6 +35,20 @@ conda activate eerieview
 export PYTHONPATH="$PWD"
 cd scripts
 python get_climatologies.py
+```
+
+Some environment variables have to be defined in a .env "dotfile" to be located in the project root
+
+```
+S3_ENDPOINT_URL=""
+S3_KEY=""
+S3_SECRET=""
+S3_BUCKET="eerie"
+CDO_LOCATION=""
+PRODUCTSDIR=""
+DIAGSDIR=""
+OBSDIR=""
+DOWNLOADIR=""
 ```
 
 ## Main scripts available
