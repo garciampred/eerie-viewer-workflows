@@ -12,6 +12,16 @@ this "production ready".
 
 The present code is also changing and evolving. Please report any bugs you may find in the issue tracker.
 
+The following is a schematic description of the main workflow:
+* Open the intake catalogue (can be “cloud” or “levante”). 
+* Loop over the variables.
+* Open the entry in the catalogue as an xarray dataset.
+* Rename the variable if needed together with coordinates.
+* Loop over the analysis dimensions (time_filter, period). For each of them compute the product, regrid to a common grid using conservative regridding, add the analysis dimensions as dimensions to the xarray dataset and append it to a list.
+* Merge all the products into a single dataset and save it to netCDF using dask.
+* A separate script converts the netCDFs to zarr and uploads it to the storage, defining the chunks so there is a single chunk for each map or time series.
+
+
 ## Instalation
 
 It is recommended to clone the project and create a conda environment with the environment.yml file. Then 
