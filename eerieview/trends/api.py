@@ -58,8 +58,8 @@ def compute_trend(
 
     if as_decadal:
         trend = trend * 10
-        attrs["units"] += "decade -1"
+        attrs["units"] = attrs.get("units", "") + "decade -1"
     else:
-        attrs["units"] += "year -1"
+        attrs["units"] = attrs.get("units", "") + "year -1"
     trend.attrs = attrs
     return trend, p_value
