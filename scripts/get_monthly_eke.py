@@ -9,13 +9,14 @@ from pathlib import Path
 from dask.distributed import Client, LocalCluster
 
 from eerieview.cmor import get_raw_variable_name, to_cmor_names
-from eerieview.constants import members_eerie_control
+from eerieview.constants import members_eerie_control, members_eerie_hist
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import EERIEMember
 from eerieview.data_processing import rename_realm
-from eerieview.ekf import DEFAULT_ENCODING, compute_monthly_eke
+from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def main():
     cluster = LocalCluster()

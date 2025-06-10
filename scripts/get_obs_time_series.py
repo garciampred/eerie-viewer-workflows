@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from dotenv import load_dotenv
 import dask
 import xarray
 
@@ -16,7 +16,7 @@ from eerieview.io_utils import safe_to_netcdf
 from eerieview.logger import get_logger
 from eerieview.metadata import fix_attributes
 from eerieview.product_computation import get_time_series
-
+load_dotenv()
 # Initialize logger for the module.
 logger = get_logger(__name__)
 
@@ -151,8 +151,8 @@ def main():
     region_set = "IPCC"  # Define the default region set for spatial aggregation.
 
     # Define reference periods for different datasets.
-    reference_period_era5 = (1951, 1970)
-    reference_period_aviso = (1991, 2010)
+    reference_period_era5 = (1951, 1980)
+    reference_period_aviso = (1991, 2020)
 
     # --- ERA5 Data Processing ---
     # List of variables to process for ERA5.
@@ -193,7 +193,7 @@ def main():
             "aviso",  # Source is AVISO
             region_set,
             reference_period=reference_period_aviso,
-            clobber=False,  # Do not overwrite existing files for AVISO data.
+            clobber=True,  # Do not overwrite existing files for AVISO data.
         )
 
 

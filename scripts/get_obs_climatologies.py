@@ -153,10 +153,10 @@ def main():
 
     # --- ERA5 Data Processing ---
     # Define periods for ERA5 data processing.
-    reference_period_era5 = (1951, 1970)
-    periods_era5 = [(1971, 1990), (1991, 2010)]
+    reference_period_era5 = (1951, 1980)
+    periods_era5 = [(1971, 2000), (1991, 2020)]
     periods_config_era5 = PeriodsConfig(reference_period_era5, periods_era5)
-    product: DecadalProduct = "clim"
+    product: DecadalProduct = "trend"
 
     # List of variables to process for ERA5.
     variables_era5 = [
@@ -186,9 +186,9 @@ def main():
     # --- AVISO Data Processing ---
     # Define periods for AVISO data processing (typically shorter timeframes).
     variables_aviso = ["zos", "eke"]
-    reference_period_aviso = (1991, 2010)
+    reference_period_aviso = (1991, 2020)
     periods_aviso = [
-        (1991, 2010)
+        (1991, 2020)
     ]  # This implies processing the reference period itself as a product
     periods_config_aviso = PeriodsConfig(reference_period_aviso, periods_aviso)
 

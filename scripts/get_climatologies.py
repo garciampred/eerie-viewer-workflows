@@ -48,8 +48,8 @@ for different experimental setups (control, historical, AMIP).
 def main_control():
     location: InputLocation = "levante"
     product: DecadalProduct = "trend"
-    reference_period = (1951, 1970)
-    periods = [(1971, 1990), (1991, 2010), (2011, 2030), (2031, 2050)]
+    reference_period = (1951, 1980)
+    periods = [(1951, 1980), (1971, 2000), (1991, 2020), (2021, 2050)]
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
 
@@ -67,17 +67,17 @@ def main_control():
             periods=periods_config,
             product=product,
             experiment="control",
-            clobber=False,
+            clobber=True,
             location=location,
             get_entry_dataset_fun=get_entry_dataset_fun,
         )
 
 
 def main_hist():
-    location: InputLocation = "cloud"
-    product: DecadalProduct = "clim"
-    reference_period = (1951, 1970)
-    periods = [(1971, 1990), (1991, 2010)]
+    location: InputLocation = "levante"
+    product: DecadalProduct = "trend"
+    reference_period = (1951, 1980)
+    periods = [(1971, 2000), (1991, 2020)]
     members = members_eerie_hist
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
@@ -104,9 +104,9 @@ def main_hist():
 
 def main_amip():
     location: InputLocation = "levante"
-    product: DecadalProduct = "trend"
-    reference_period = (1981, 2000)
-    periods = [(2000, 2021)]
+    product: DecadalProduct = "clim"
+    reference_period = (1981, 2010)
+    periods = [(1991, 2020)]
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
     variables_amip = [v for v in VARIABLES if v not in ["eke", "zos"]]
@@ -120,9 +120,9 @@ def main_amip():
             periods=periods_config,
             product=product,
             experiment="hist-amip",
-            clobber=False,
+            clobber=True,
         )
 
 
 if __name__ == "__main__":
-    main_hist()
+    main_amip()
