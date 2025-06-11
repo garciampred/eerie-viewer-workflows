@@ -434,8 +434,8 @@ def fix_units(
         dataset[varname].attrs["units"] = "mm day-1"  # Set the correct units
     # Convert temperature variables from Kelvin to Celsius, unless it's a trend product
     if (
-        varname in ["tasmax", "tasmin", "tas"]
-        and dataset[varname].attrs.get("units") != "degC"
+        varname in ["tasmax", "tasmin", "tas", "tos"]
+        and dataset[varname].isel(time=0).max().compute().item() > 200
     ):
         if (
             product != "trend"
