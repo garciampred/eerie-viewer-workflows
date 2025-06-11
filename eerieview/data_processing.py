@@ -428,7 +428,7 @@ def fix_units(
     if varname == "pr":
         factor = 86400  # seconds in a day
         # If ICON precipitation is in meters per second, convert to mm/day
-        if "m s**-1" in dataset[varname].attrs["units"]:
+        if "m s**-1" in dataset[varname].attrs.get("units", ""):
             factor *= 1000  # meters to millimeters
         dataset[varname] = dataset[varname] * factor
         dataset[varname].attrs["units"] = "mm day-1"  # Set the correct units
