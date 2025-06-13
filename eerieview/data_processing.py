@@ -426,16 +426,18 @@ def fix_units(
 ) -> xarray.Dataset:
     """Fix units of certain variables to a common standard (e.g., K to degC, m/s to mm/day)."""
     if varname == "pr":
-        factor = 86400  # seconds in a day
-        # If ICON precipitation is in meters per second, convert to mm/day
-        if "m s**-1" in dataset[varname].attrs.get("units", ""):
-            factor *= 1000  # meters to millimeters
-        dataset[varname] = dataset[varname] * factor
+        units = dataset[varname].attrs.get("units", "")
+        if units != "mm":
+            factor = 86400  # seconds in a day
+            # If ICON precipitation is in meters per second, convert to mm/day
+            if "m s**-1" in dataset[varname].attrs.get("units", ""):
+                factor *= 1000  # meters to millimeters
+            dataset[varname] = dataset[varname] * factor
         dataset[varname].attrs["units"] = "mm day-1"  # Set the correct units
     # Convert temperature variables from Kelvin to Celsius, unless it's a trend product
     if (
         varname in ["tasmax", "tasmin", "tas", "tos"]
-        and dataset[varname].isel(time=0).max().compute().item() > 200
+        and dataset[varname].isel(time=5).max().compute().item() > 200
     ):
         if (
             product != "trend"

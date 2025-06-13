@@ -249,7 +249,7 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
         for attrname in ["long_name", "standard_name", "units"]:
             attrval = attrs[attrname]
             if attrname == "units":
-                if varname_noanom in ["tas", "tasmin", "tasmax"]:
+                if varname_noanom in ["tas", "tasmin", "tasmax", "tos"]:
                     attrval = "degC"
                 if varname_noanom == "pr":
                     attrval = "mm day-1"
@@ -289,20 +289,20 @@ def main():
         "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke"]]
-    for product in ["clim", "trend"]:
-        upload_obs_climatologies(variables, product=product)
-        for experiment in ["hist", "control", "hist-amip"]:
-            if experiment == "hist-amip":
-                variables_exp = variables_amip
-            else:
-                variables_exp = variables
-            logger.info(f"Uploading {product=} for {experiment=}")
-            upload_eerie_climatologies(
-                variables_exp, product=product, experiment=experiment, grid="025"
-            )
+    # for product in ["clim", "trend"]:
+    #     upload_obs_climatologies(variables, product=product)
+    #     for experiment in ["hist", "control", "hist-amip"]:
+    #         if experiment == "hist-amip":
+    #             variables_exp = variables_amip
+    #         else:
+    #             variables_exp = variables
+    #         logger.info(f"Uploading {product=} for {experiment=}")
+    #         upload_eerie_climatologies(
+    #             variables_exp, product=product, experiment=experiment, grid="025"
+    #         )
     upload_time_series(variables, variables_amip, "IPCC")
     upload_time_series(variables, variables_amip, "EDDY")
 
 
 if __name__ == "__main__":
-    upload_eddy_rich_zarr()
+    main()
