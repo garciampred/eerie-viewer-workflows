@@ -15,8 +15,8 @@ members_eerie_future = [
 ]
 
 futuremember2hist = {
-    members_eerie_hist[0]: members_eerie_future[0],
-    members_eerie_hist[1]: members_eerie_future[1],
+    members_eerie_future[0]: members_eerie_hist[0],
+    members_eerie_future[1]: members_eerie_hist[1],
 }
 
 members_eerie_hist_amip = [
