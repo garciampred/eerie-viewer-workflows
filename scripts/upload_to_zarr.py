@@ -179,7 +179,9 @@ def upload_obs_time_series(variables: list[str], region_set: str):
 def upload_eddy_rich_zarr():
     variables = ["uo", "vo"]
     ifile = Path(
-        os.environ["PRODUCTSDIR"], "misc", "icon-esm-er.hist-1950_u_v_ocean_19700101.nc"
+        os.environ["PRODUCTSDIR"],
+        "misc",
+        "icon-esm-er.hist-1950_u_v_ocean_197001_19700212_weekly.nc",
     )
     bucket = os.environ["S3_BUCKET"]
     zarr_url = f"s3://{bucket}/misc/icon-esm-er.hist-1950_u_v_ocean_19700101.zarr"
@@ -289,20 +291,20 @@ def main():
         "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke"]]
-    # for product in ["clim", "trend"]:
-    #     upload_obs_climatologies(variables, product=product)
-    #     for experiment in ["hist", "control", "hist-amip"]:
-    #         if experiment == "hist-amip":
-    #             variables_exp = variables_amip
-    #         else:
-    #             variables_exp = variables
-    #         logger.info(f"Uploading {product=} for {experiment=}")
-    #         upload_eerie_climatologies(
-    #             variables_exp, product=product, experiment=experiment, grid="025"
-    #         )
+    for product in ["clim", "trend"]:
+        upload_obs_climatologies(variables, product=product)
+        for experiment in ["hist", "control", "hist-amip"]:
+            if experiment == "hist-amip":
+                variables_exp = variables_amip
+            else:
+                variables_exp = variables
+            logger.info(f"Uploading {product=} for {experiment=}")
+            upload_eerie_climatologies(
+                variables_exp, product=product, experiment=experiment, grid="025"
+            )
     upload_time_series(variables, variables_amip, "IPCC")
     upload_time_series(variables, variables_amip, "EDDY")
 
 
 if __name__ == "__main__":
-    main()
+    upload_eddy_rich_zarr()
