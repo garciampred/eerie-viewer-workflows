@@ -74,7 +74,7 @@ def main_control():
         )
 
 
-def main_scenario():
+def main_future():
     location: InputLocation = "levante"
     product: DecadalProduct = "clim"
     reference_period = (1951, 1980)
@@ -97,7 +97,7 @@ def main_scenario():
             members=members,
             periods=periods_config,
             product=product,
-            experiment="hist",
+            experiment="future",
             clobber=False,
             get_entry_dataset_fun=get_entry_dataset_fun,
         )
