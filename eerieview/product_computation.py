@@ -8,6 +8,7 @@ import xarray
 
 from eerieview.cdo import cdo_regrid
 from eerieview.cmor import get_raw_variable_name, to_cmor_names
+from eerieview.constants import futuremember2hist
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import (
     DecadalProduct,
@@ -146,24 +147,24 @@ def get_model_decadal_product(
         member = rename_realm(member_str, varname)
         # Get the raw variable name from the CMOR mapping
         rawname = get_raw_variable_name(member, varname)
-
-        try:
-            # Attempt to retrieve the dataset for the current member and variable
-            dataset = get_entry_dataset_fun(
-                catalogue, member, rawname, location=location
-            )
-        except KeyError:
-            # If a KeyError occurs, retry with common fixes
-            dataset, member, rawname = retry_get_entry_with_fixes(
+        if "future" in member:
+            dataset_future, member, rawname = _get_member(
                 catalogue, get_entry_dataset_fun, location, member, rawname, varname
             )
-
-        # Handle realization dimension if present by averaging
-        if "realization" in dataset:
-            logger.info(
-                "Realization dimension detected. Averaging the ensemble members."
+            member_hist = futuremember2hist[member]
+            dataset_hist, member, rawname = _get_member(
+                catalogue,
+                get_entry_dataset_fun,
+                location,
+                member_hist,
+                rawname,
+                varname,
             )
-            dataset = dataset.mean(dim="realization")
+            dataset = xarray.concat([dataset_hist, dataset_future], dim="time")
+        else:
+            dataset, member, rawname = _get_member(
+                catalogue, get_entry_dataset_fun, location, member, rawname, varname
+            )
 
         # Squeeze out singleton dimensions
         dataset = dataset.squeeze()
@@ -226,6 +227,22 @@ def get_model_decadal_product(
     final_dataset = dask.optimize(final_dataset)[0]
     safe_to_netcdf(final_dataset, output_path, show_progress=True)
     return output_path
+
+
+def _get_member(catalogue, get_entry_dataset_fun, location, member, rawname, varname):
+    try:
+        # Attempt to retrieve the dataset for the current member and variable
+        dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
+    except KeyError:
+        # If a KeyError occurs, retry with common fixes
+        dataset, member, rawname = retry_get_entry_with_fixes(
+            catalogue, get_entry_dataset_fun, location, member, rawname, varname
+        )
+    # Handle realization dimension if present by averaging
+    if "realization" in dataset:
+        logger.info("Realization dimension detected. Averaging the ensemble members.")
+        dataset = dataset.mean(dim="realization")
+    return dataset, member, rawname
 
 
 def get_decadal_product_or_fill_with_nan(

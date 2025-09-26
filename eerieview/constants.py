@@ -9,6 +9,16 @@ members_eerie_hist = [
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
 ]
 
+members_eerie_future = [
+    "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
+    "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
+]
+
+futuremember2hist = {
+    members_eerie_hist[0]: members_eerie_future[0],
+    members_eerie_hist[1]: members_eerie_future[1],
+}
+
 members_eerie_hist_amip = [
     "ifs-amip-tco1279.hist.v20240901.atmos.gr025.2D_monthly",
     "ifs-amip-tco1279.hist-c-0-a-lr20.v20240901.atmos.gr025.2D_monthly",
