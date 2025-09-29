@@ -3,8 +3,8 @@ from itertools import product
 import pytest
 
 from eerieview.constants import members_eerie_hist
+from eerieview.product_computation import get_model_time_series
 from scripts.get_obs_time_series import get_obs_time_series
-from scripts.get_time_series import get_model_time_series
 from tests.conftest import mocked_get_entry_dataset, mocked_get_obs_dataset
 
 
