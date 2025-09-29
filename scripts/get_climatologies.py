@@ -155,4 +155,4 @@ def main_amip():
 
 
 if __name__ == "__main__":
-    main_hist()
+    main_future()

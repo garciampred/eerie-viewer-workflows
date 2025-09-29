@@ -151,8 +151,9 @@ def get_model_decadal_product(
             dataset_future, member, rawname = _get_member(
                 catalogue, get_entry_dataset_fun, location, member, rawname, varname
             )
-            member_hist = futuremember2hist[member]
-            dataset_hist, member, rawname = _get_member(
+            member_hist = futuremember2hist[member_str]
+            member_hist = rename_realm(member_hist, varname)
+            dataset_hist, _ , rawname = _get_member(
                 catalogue,
                 get_entry_dataset_fun,
                 location,
