@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from eerieview.constants import (
     members_eerie_control,
+    members_eerie_future,
     members_eerie_hist,
     members_eerie_hist_amip,
 )
@@ -29,6 +30,7 @@ def get_exp_time_series(experiment: str, region_set: str):
         "hist-amip": members_eerie_hist_amip,
         "hist": members_eerie_hist,
         "control": members_eerie_control,
+        "future": members_eerie_future,
     }
     members = exp2members[experiment]
     reference_period = exp2ref_period[experiment]
@@ -80,7 +82,9 @@ def get_exp_time_series(experiment: str, region_set: str):
 
 def main():
     region_sets = ["IPCC", "EDDY"]
-    experiments = ["control", "hist", "hist-amip"]
+    experiments = [
+        "future",
+    ]  # ["control", "hist", "hist-amip"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)
