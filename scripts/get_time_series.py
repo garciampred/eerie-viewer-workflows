@@ -24,6 +24,7 @@ def get_exp_time_series(experiment: str, region_set: str):
     exp2ref_period = {
         "hist-amip": (1981, 2000),
         "hist": (1951, 1980),
+        "future": (1951, 1980),
         "control": (1951, 1980),
     }
     exp2members = {
