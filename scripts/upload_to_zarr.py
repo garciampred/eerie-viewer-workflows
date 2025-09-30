@@ -27,6 +27,8 @@ member2shortmeber = {
     "ifs-amip-tco399-hist-c-0-a-lr20": "ifs-amip-tco399-hist-c-0-a-lr20",
     "ifs-amip-tco399-hist-c-lr20-a-0": "ifs-amip-tco399-hist-c-lr20-a-0",
     "ifs-amip-tco399-hist": "ifs-amip-tco399-hist",
+    "icon-esm-er-highres-future-ssp245": "icon",
+    "ifs-fesom2-sr-highres-future-ssp245": "ifs-fesom2",
 }
 
 
@@ -270,10 +272,11 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
 def upload_time_series(
     variables: list[str], variables_amip: list[str], region_set: str
 ):
-    upload_obs_time_series(variables, region_set)
-    upload_eerie_time_series(variables, "hist", region_set)
-    upload_eerie_time_series(variables_amip, "hist-amip", region_set)
-    upload_eerie_time_series(variables, "control", region_set)
+    # upload_obs_time_series(variables, region_set)
+    # upload_eerie_time_series(variables, "hist", region_set)
+    # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
+    # upload_eerie_time_series(variables, "control", region_set)
+    upload_eerie_time_series(variables, "future", region_set)
 
 
 def main():
@@ -288,12 +291,12 @@ def main():
         "tasmax",
         "tasmin",
         "zos",
-        "eke",
+        # "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke"]]
     for product in ["clim", "trend"]:
-        upload_obs_climatologies(variables, product=product)
-        for experiment in ["hist", "control", "hist-amip"]:
+        # upload_obs_climatologies(variables, product=product)
+        for experiment in ["future"]:  # ["hist", "control", "hist-amip"]:
             if experiment == "hist-amip":
                 variables_exp = variables_amip
             else:
@@ -307,4 +310,4 @@ def main():
 
 
 if __name__ == "__main__":
-    upload_eddy_rich_zarr()
+    main()
