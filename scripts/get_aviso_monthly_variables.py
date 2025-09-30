@@ -5,24 +5,37 @@ from pathlib import Path
 
 import xarray
 from dask.diagnostics import ProgressBar
+from dask.distributed import Client
+from dotenv import load_dotenv
 
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
 
+load_dotenv()
+
 
 def main_eke():
+    client = Client()
+    print(client)
+    print(client.dashboard_link)
     # Monthly eddy kinetic energy.
     storage_dir = Path(os.environ["DOWNLOADIR"], "aviso")
     # TODO: Downloaded by hand from DKRZ, make it reproducible
     daily_anom_zos_file = Path(storage_dir, "zos_anom_aviso_daily.nc")
     aviso_daily_zos_file = Path(storage_dir, "adt_aviso_daily.nc")
     dataset = xarray.open_dataset(
-        aviso_daily_zos_file, chunks=dict(time=1000, latitude=100, longitude=100)
+        aviso_daily_zos_file, chunks=dict(time=-1, latitude=100, longitude=100)
     ).rename(adt="zos", longitude="lon", latitude="lat")
     # Compute 30-day rolling daily climatology of SSH
     zos_daily_climatology_file = Path(storage_dir, "zos_clim_aviso_dayofyear.nc")
+    zos_daily_climatology_file_intermediate = Path(
+        storage_dir, "zos_clim_aviso_dayofyear_intermediate.nc"
+    )
     eke_monthly = compute_monthly_eke(
-        dataset, zos_daily_climatology_file, daily_anom_zos_file
+        dataset,
+        daily_anom_zos_file,
+        zos_daily_climatology_file,
+        zos_daily_climatology_file_intermediate,
     )
     # Compute Monthly Mean EKE:  N.B.: Cannot use monthly SSH to do this
     timeindex = eke_monthly.time.to_index()
@@ -51,4 +64,4 @@ def main_zos():
 
 
 if __name__ == "__main__":
-    main_zos()
+    main_eke()
