@@ -19,9 +19,27 @@ DEFAULT_ENCODING = dict(
 )
 
 
-def remove_smooth_climatology(
-    da: xarray.DataArray, da_clim_file: Path, da_21_year_file: Path
-):
+def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
+    if da.isnull().all():
+        return da
+    decadal_window_size = 21  # years
+    smooth_window_len = 5  # days
+    # Rolling average for each day of year, with some years around
+    da_rolling_clims = da.groupby("time.dayofyear").map(
+        lambda x: x.rolling(
+            time=decadal_window_size,
+            min_periods=decadal_window_size // 2,
+            center=True,
+        ).mean()
+    )
+    # Rolling average for each time with a few days around
+    da_rolling_clims_smoothed = da_rolling_clims.rolling(
+        time=smooth_window_len, min_periods=smooth_window_len // 2, center=True
+    ).mean()
+    return da_rolling_clims_smoothed
+
+
+def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
     """Compute daily Climatology & Smooth.
 
     We follow https://www.nature.com/articles/s41558-022-01478-3
@@ -32,34 +50,8 @@ def remove_smooth_climatology(
         # 21-year moving average for each dayofyear (assuming 'time' is daily data)
         # min periods 10 ensures no data is filled with nan in the borders, even if the
         # samples are smaller.
-        if not da_21_year_file.exists():
-            da_dayofyear_rolling_clim = (
-                da.groupby("time.dayofyear")
-                .map(lambda x: x.rolling(time=21, min_periods=10).mean())
-                .chunk(dict(time=-1, lat=100, lon=100))
-                .to_dataset()
-            )
-            safe_to_netcdf(
-                da_dayofyear_rolling_clim,
-                da_21_year_file,
-                encoding=dict(zos=DEFAULT_ENCODING),
-                show_progress=True,
-            )
-        else:
-            da_dayofyear_rolling_clim = xarray.open_dataset(
-                da_clim_file, chunks=dict(time=-1)
-            ).to_datarray()
-
-        smooth_window_len = (
-            5  # days,  to smooth daily climatology to detrend the signal
-        )
-
-        da_dayofyear_rolling_clim = (
-            da_dayofyear_rolling_clim.rolling(
-                time=smooth_window_len,
-                center=True,
-                min_periods=int(smooth_window_len // 2),
-            ).mean()
+        da_dayofyear_rolling_clim = xarray.map_blocks(
+            rolling_smooth_annual_cycly, da, template=da
         ).to_dataset()
         safe_to_netcdf(
             da_dayofyear_rolling_clim,
@@ -129,7 +121,6 @@ def compute_monthly_eke(
     dataset: xarray.Dataset,
     daily_anom_zos_file: Path,
     zos_daily_climatology_file: Path,
-    zos_daily_climatology_file_intermediate: Path,
 ) -> xarray.Dataset:
     """Compute monthly Eddy Kinetic Energy from the sea level.
 
@@ -139,7 +130,6 @@ def compute_monthly_eke(
         zos_daily_anom = remove_smooth_climatology(
             dataset.zos,
             zos_daily_climatology_file,
-            zos_daily_climatology_file_intermediate,
         )
         safe_to_netcdf(
             zos_daily_anom,
