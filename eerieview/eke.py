@@ -137,6 +137,7 @@ def compute_monthly_eke(
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
         )
+        zos_daily_anom = zos_daily_anom.zos
     else:
         zos_daily_anom = xarray.open_dataset(
             daily_anom_zos_file, chunks=dict(time=10, lon=-1, lat=-1)
