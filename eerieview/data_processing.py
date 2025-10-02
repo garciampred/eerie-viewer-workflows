@@ -350,11 +350,11 @@ def retry_get_entry_with_fixes(
     if varname == "tasmax" and "fesom" in member:
         member = member.replace("avg", "max")
         if "24" not in rawname:
-            rawname += "24" #  Append '24' to rawname for daily maximum
+            rawname += "24"  #  Append '24' to rawname for daily maximum
     if varname == "tasmin" and "fesom" in member:
         member = member.replace("avg", "min")
         if "24" not in rawname:
-            rawname += "24" # Append '24' to rawname for daily minimum
+            rawname += "24"  # Append '24' to rawname for daily minimum
 
     # Retry getting the dataset with the applied fixes
     dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
@@ -455,9 +455,9 @@ def rename_realm(member: str, varname: str) -> str:
     if varname in OCEAN_VARIABLES and "amip" not in member:
         member = member.replace("atmos", "ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
-       # if "ifs-fesom2-sr" in member:
-       #     member = member.replace("monthly", "daily")
-       #     member += "_1950-2014"
+        if "ifs-fesom2-sr" in member and "hist" in member:
+            member = member.replace("monthly", "daily")
+            member += "_1950-2014"
     # Adjust member string for ICON tasmax/tasmin variables
     if "icon" in member and varname in ["tasmax", "tasmin"]:
         extreme = "max" if varname == "tasmax" else "min"
