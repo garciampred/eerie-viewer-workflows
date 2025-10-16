@@ -29,7 +29,7 @@ members_eerie_hist_amip = [
 
 missing_periods = ["1950-1969"]
 AVISO_VARIABLES = ["eke", "zos"]
-OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo"]
+OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo", "so"]
 CMOR2EERIE = {
     "pr": "tprate",
     "tas": "mean2t",
@@ -43,6 +43,7 @@ CMOR2EERIE = {
     "sic": "mci",
     "sfcWind": "mean10ws",
     "eke": "eke",
+    "so": "avg_sos",
 }
 CMOR2EERIEAMIP = CMOR2EERIE.copy()
 CMOR2EERIEAMIP.update({"uas": "avg_10u", "vas": "avg_10v", "tos": "avg_sst"})

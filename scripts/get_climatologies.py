@@ -35,6 +35,7 @@ VARIABLES = [
     "clt",
     "tasmax",
     "tasmin",
+    "so",
     "eke",
 ]
 
@@ -46,9 +47,8 @@ for different experimental setups (control, historical, AMIP).
 """
 
 
-def main_control():
+def main_control(product: DecadalProduct):
     location: InputLocation = "levante"
-    product: DecadalProduct = "trend"
     reference_period = (1951, 1980)
     periods = [(1951, 1980), (1971, 2000), (1991, 2020), (2021, 2050)]
     periods_config = PeriodsConfig(reference_period, periods)
@@ -68,15 +68,14 @@ def main_control():
             periods=periods_config,
             product=product,
             experiment="control",
-            clobber=True,
+            clobber=False,
             location=location,
             get_entry_dataset_fun=get_entry_dataset_fun,
         )
 
 
-def main_future():
+def main_future(product: DecadalProduct):
     location: InputLocation = "levante"
-    product: DecadalProduct = "clim"
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020), (2021, 2050)]
     members = members_eerie_future
@@ -103,9 +102,8 @@ def main_future():
         )
 
 
-def main_hist():
+def main_hist(product: DecadalProduct):
     location: InputLocation = "levante"
-    product: DecadalProduct = "clim"
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020)]
     members = members_eerie_hist
@@ -155,4 +153,7 @@ def main_amip():
 
 
 if __name__ == "__main__":
-    main_future()
+    main_future("clim")
+    main_future("trend")
+    main_control("clim")
+    main_control("trend")

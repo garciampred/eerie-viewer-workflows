@@ -24,6 +24,8 @@ from eerieview.logger import get_logger
 
 load_dotenv()
 logger = get_logger(__name__)
+import logging
+logging.getLogger("distributed").setLevel(logging.ERROR)
 
 
 def compute_eke_for_member(member: str, location: InputLocation, clobber: bool = False):

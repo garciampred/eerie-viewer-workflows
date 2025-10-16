@@ -455,7 +455,7 @@ def rename_realm(member: str, varname: str) -> str:
     if varname in OCEAN_VARIABLES and "amip" not in member:
         member = member.replace("atmos", "ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
-        if "ifs-fesom2-sr" in member and "hist" in member:
+        if "ifs-fesom2-sr" in member and ("hist" in member or "control" in member):
             member = member.replace("monthly", "daily")
             member += "_1950-2014"
     # Adjust member string for ICON tasmax/tasmin variables

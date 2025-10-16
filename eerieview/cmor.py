@@ -17,6 +17,8 @@ def get_raw_variable_name(member: str, varname: str) -> str:
             rawname = "sfcwind"
         elif varname in ["tasmax", "tasmin"]:
             rawname = "tas"
+        elif varname == "so":
+            rawname = "so"
         else:
             rawname = varname
     elif "amip" in member:
