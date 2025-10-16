@@ -272,10 +272,10 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
 def upload_time_series(
     variables: list[str], variables_amip: list[str], region_set: str
 ):
-    # upload_obs_time_series(variables, region_set)
-    # upload_eerie_time_series(variables, "hist", region_set)
-    # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
-    # upload_eerie_time_series(variables, "control", region_set)
+    upload_obs_time_series(variables, region_set)
+    upload_eerie_time_series(variables, "hist", region_set)
+    upload_eerie_time_series(variables_amip, "hist-amip", region_set)
+    upload_eerie_time_series(variables, "control", region_set)
     upload_eerie_time_series(variables, "future", region_set)
 
 
@@ -291,12 +291,12 @@ def main():
         "tasmax",
         "tasmin",
         "zos",
-        # "eke",
+        "eke",
     ]
-    variables_amip = [v for v in variables if v not in ["zos", "eke"]]
+    variables_amip = [v for v in variables if v not in ["zos", "eke", "so"]]
     for product in ["clim", "trend"]:
-        # upload_obs_climatologies(variables, product=product)
-        for experiment in ["future"]:  # ["hist", "control", "hist-amip"]:
+        upload_obs_climatologies(variables, product=product)
+        for experiment in ["future", "hist", "control"]:  # , "hist-amip"]:
             if experiment == "hist-amip":
                 variables_exp = variables_amip
             else:
