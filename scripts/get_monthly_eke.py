@@ -25,6 +25,7 @@ from eerieview.logger import get_logger
 load_dotenv()
 logger = get_logger(__name__)
 import logging
+
 logging.getLogger("distributed").setLevel(logging.ERROR)
 
 
@@ -72,6 +73,7 @@ def main():
     print("Dashboard URL:", client.dashboard_link)
     location: InputLocation = "levante"
     all_members = members_eerie_future + members_eerie_hist + members_eerie_control
+    all_members = ["ifs-nemo-er.hist-1950.v20250516.atmos.gr025"]
     for member in all_members:
         logger.info(f"Computing monthly EKE for {member}")
         try:

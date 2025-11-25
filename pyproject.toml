@@ -37,7 +37,8 @@ ignore = [
   # pydocstyle: Missing Docstrings
   "D1",
   "F841",
-  "D205"
+  "D205",
+  "E402"
 ]
 select = [
   # pyflakes

@@ -1,22 +1,31 @@
 location2prefix = dict(cloud="dkrz.cloud", levante="dkrz.disk.model-output")
 members_eerie_control = [
-    # "hadgem3-gc5-n640-orca12.eerie-picontrol.atmos.gr025.daily.0",
     "icon-esm-er.eerie-control-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.atmos.gr025.2D_monthly_avg",
+    "hadgem3-gc5-n640-orca1.eerie-picontrol.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.eerie-picontrol.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.eerie-picontrol.atmos.gr025.daily",
 ]
 members_eerie_hist = [
     "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
+    "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
+    "hadgem3-gc5-n640-orca1.hist-1950.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.hist-1950.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.hist-1950.atmos.gr025.daily",
 ]
 
 members_eerie_future = [
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
+    "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025",
+    "hadgem3-gc5-n640-orca1.highres-future-ssp245.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.highres-future-ssp245.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.highres-future-ssp245.atmos.gr025.daily",
 ]
 
 futuremember2hist = {
-    members_eerie_future[0]: members_eerie_hist[0],
-    members_eerie_future[1]: members_eerie_hist[1],
+    hist: future for hist, future in zip(members_eerie_hist, members_eerie_future)
 }
 
 members_eerie_hist_amip = [
