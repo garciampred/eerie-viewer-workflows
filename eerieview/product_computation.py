@@ -146,7 +146,8 @@ def get_model_decadal_product(
         # Rename the member string based on variable realm
         member = rename_realm(member_str, varname)
         # Get the raw variable name from the CMOR mapping
-        rawname = get_raw_variable_name(member, varname)
+        #rawname = get_raw_variable_name(member, varname)
+        rawname = varname
         dataset, member, rawname = get_complete_input_dataset(
             catalogue,
             get_entry_dataset_fun,
@@ -251,6 +252,7 @@ def get_member_dataset(
         # Attempt to retrieve the dataset for the current member and variable
         dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
     except KeyError:
+        raise
         # If a KeyError occurs, retry with common fixes
         dataset, member, rawname = retry_get_entry_with_fixes(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname

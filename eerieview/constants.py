@@ -1,17 +1,17 @@
-location2prefix = dict(cloud="dkrz.cloud", levante="dkrz.disk.model-output")
+location2prefix = dict(cloud="dkrz.cloud", levante="dkrz.disk.CMOR")
 members_eerie_control = [
     # "hadgem3-gc5-n640-orca12.eerie-picontrol.atmos.gr025.daily.0",
     "icon-esm-er.eerie-control-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.atmos.gr025.2D_monthly_avg",
 ]
 members_eerie_hist = [
-    "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
-    "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
+    "ifs-fesom2-sr.hist-1950.v20240304.gr025.Amon",
+    "icon-esm-er.hist-1950.v20240618.gr025.Amon",
 ]
 
 members_eerie_future = [
-    "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
-    "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
+    "ifs-fesom2-sr.highres-future-ssp245.v20240304.gr025.Amon",
+    "icon-esm-er.highres-future-ssp245.v20240618.gr025.Amon",
 ]
 
 futuremember2hist = {
