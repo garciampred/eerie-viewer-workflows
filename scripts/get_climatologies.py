@@ -79,10 +79,10 @@ def main_future(product: DecadalProduct):
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020), (2021, 2050)]
     if product == "trend":
-        periods += [(1951, 2050), ]
+        periods += (1951, 2050)
     members = members_eerie_future
     periods_config = PeriodsConfig(reference_period, periods)
-    output_dir = Path(os.environ["PRODUCTSDIR"], "decadal_cmor")
+    output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
 
     for varname in VARIABLES:
         logger.info(f"Processing {varname} data for 'future' experiments")
@@ -99,7 +99,7 @@ def main_future(product: DecadalProduct):
             periods=periods_config,
             product=product,
             experiment="future",
-            clobber=True,
+            clobber=False,
             get_entry_dataset_fun=get_entry_dataset_fun,
         )
 
@@ -156,3 +156,6 @@ def main_amip():
 
 if __name__ == "__main__":
     main_future("clim")
+    main_future("trend")
+    main_control("clim")
+    main_control("trend")

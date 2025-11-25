@@ -50,7 +50,6 @@ def get_exp_time_series(experiment: str, region_set: str):
         "tasmax",
         "tasmin",
         "eke",
-        "so"
     ]
 
     # Iterate through each variable to process.
@@ -85,8 +84,8 @@ def get_exp_time_series(experiment: str, region_set: str):
 def main():
     region_sets = ["IPCC", "EDDY"]
     experiments = [
-        "control", "hist", "future"
-    ]  # ["future", "control", "hist", "hist-amip"]
+        "future",
+    ]  # ["control", "hist", "hist-amip"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)

@@ -16,14 +16,15 @@ class EERIEMember:
     model: str
     simulation: str
     version: str
+    realm: str
     grid: str
-    cmor_table: str
+    freq: str
 
     @classmethod
     def from_string(cls, member_str: str) -> "EERIEMember":
         pieces = member_str.split(".")
-        if len(pieces) != 5:
-            raise RuntimeError("Member string must have 5 sections separated by points")
+        if len(pieces) != 6:
+            raise RuntimeError("Member string must have 6 sections separated by points")
         return cls(*pieces)
 
     @property
