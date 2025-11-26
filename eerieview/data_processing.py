@@ -12,6 +12,7 @@ import xarray_regrid  # noqa: F401 # Imported for its side effects (adds .regrid
 from eerieview.constants import OCEAN_VARIABLES
 from eerieview.data_models import (
     CmorEerieMember,
+    EERIEMember,
     EERIEProduct,
     InputLocation,
     Member,
@@ -347,25 +348,49 @@ def retry_get_entry_with_fixes(
     catalogue: dict,
     get_entry_dataset_fun,
     location: InputLocation,
-    member: str,
+    member: Member,
     rawname: str,
     varname: str,
 ) -> tuple[xarray.Dataset, str, str]:
     """Attempt to retrieve a dataset with common fixes if the initial attempt fails."""
-    member = member.replace("monthly", "daily")
+    if isinstance(member, EERIEMember):
+        member_str = member.to_string()
+        member_str = member_str.replace("monthly", "daily")
 
-    # Specific fixes for tasmax/tasmin with fesom
-    if varname == "tasmax" and "fesom" in member:
-        member = member.replace("avg", "max")
-        if "24" not in rawname:
-            rawname += "24"  #  Append '24' to rawname for daily maximum
-    if varname == "tasmin" and "fesom" in member:
-        member = member.replace("avg", "min")
-        if "24" not in rawname:
-            rawname += "24"  # Append '24' to rawname for daily minimum
+        # Specific fixes for tasmax/tasmin with fesom
+        if varname == "tasmax" and "fesom" in member_str:
+            member_str = member_str.replace("avg", "max")
+            if "24" not in rawname:
+                rawname += "24"  #  Append '24' to rawname for daily maximum
+        if varname == "tasmin" and "fesom" in member_str:
+            member_str = member_str.replace("avg", "min")
+            if "24" not in rawname:
+                rawname += "24"  # Append '24' to rawname for daily minimum
+        member = EERIEMember.from_string(member_str)
+        # Retry getting the dataset with the applied fixes
+        dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
+    elif isinstance(member, CmorEerieMember):
+        if EERIEMember.model == "ifs-nemo-er":
+            # Read from files
+            # base : /work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER/
+            # dirs : hist-1950/r1i1p1f1/Amon/tasmax/gr/v20250516/
+            # filename: tasmax_Amon_IFS-NEMO-ER_hist-1950_r1i1p1f1_gr_200801-200806.nc
+            basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
+            dirs = (
+                f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/gr/"
+                f"{member.version}/"
+            )
+            path_pattern = Path(basedir, dirs, f"{varname}*.nc")
+            dataset = xarray.open_mfdataset(path_pattern)
+        elif "HadGEM" in member.model:
+            # read HadGEM
+            pass
+        else:
+            raise RuntimeError
 
-    # Retry getting the dataset with the applied fixes
-    dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
+    else:
+        raise RuntimeError
+
     return dataset, member, rawname
 
 
