@@ -383,8 +383,10 @@ def retry_get_entry_with_fixes(
             f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/{grid}/"
             f"{member.version}/"
         )
-        path_pattern = Path(basedir, dirs, f"{varname}*.nc")
-        dataset = xarray.open_mfdataset(path_pattern)
+        path_with_files = Path(basedir, dirs)
+        paths_to_read = sorted(path_with_files.glob(f"{varname}*.nc"))
+        logger.info(f"Reading {paths_to_read}")
+        dataset = xarray.open_mfdataset(paths_to_read)
     else:
         raise RuntimeError(f"Unknown member type {member}")
 
