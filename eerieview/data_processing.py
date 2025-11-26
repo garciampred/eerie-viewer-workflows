@@ -373,12 +373,14 @@ def retry_get_entry_with_fixes(
         # Read from files
         if member.model == "ifs-nemo-er":
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
+            grid = "gr"
         elif "hadgem3" in member.model.lower():
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
+            grid = "gr1"
         else:
             raise RuntimeError(f"Unkown model: {member.model}")
         dirs = (
-            f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/gr/"
+            f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/{grid}/"
             f"{member.version}/"
         )
         path_pattern = Path(basedir, dirs, f"{varname}*.nc")
