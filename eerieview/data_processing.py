@@ -377,6 +377,8 @@ def retry_get_entry_with_fixes(
         elif "hadgem3" in member.model.lower():
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
             grid = "gr1"
+            if rawname == "tos":
+                rawname = "toscon"
         else:
             raise RuntimeError(f"Unkown model: {member.model}")
         dirs = (
@@ -395,7 +397,7 @@ def retry_get_entry_with_fixes(
         "forecast_period",
         "time_bnds",
     ]
-    dataset = dataset.squeeze().drop_vars(vars_to_drop, errors="ignore")
+    dataset = dataset.drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname
 
 
