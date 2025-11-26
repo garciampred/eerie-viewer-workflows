@@ -102,7 +102,7 @@ def get_model_decadal_product(
     experiment: str = "control",
     clobber: bool = False,
     get_entry_dataset_fun=get_entry_dataset,
-    member_class: Member = EERIEMember,
+    member_class: type[Member] = EERIEMember,
 ) -> Path:
     """Compute and save decadal products (e.g., climatologies, trends) for a given variable.
 

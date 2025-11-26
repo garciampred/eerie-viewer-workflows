@@ -11,6 +11,7 @@ from eerieview.constants import (
 )
 from eerieview.data_access import get_diagnostic, get_entry_dataset
 from eerieview.data_models import (
+    CmorEerieMember,
     DecadalProduct,
     InputLocation,
     PeriodsConfig,
@@ -71,6 +72,7 @@ def main_control(product: DecadalProduct):
             clobber=False,
             location=location,
             get_entry_dataset_fun=get_entry_dataset_fun,
+            member_class=CmorEerieMember,
         )
 
 
@@ -101,6 +103,7 @@ def main_future(product: DecadalProduct):
             experiment="future",
             clobber=False,
             get_entry_dataset_fun=get_entry_dataset_fun,
+            member_class=CmorEerieMember,
         )
 
 
@@ -129,6 +132,7 @@ def main_hist(product: DecadalProduct):
             experiment="hist",
             clobber=False,
             get_entry_dataset_fun=get_entry_dataset_fun,
+            member_class=CmorEerieMember,
         )
 
 
