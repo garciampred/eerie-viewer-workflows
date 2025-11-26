@@ -373,7 +373,7 @@ def retry_get_entry_with_fixes(
         # Read from files
         if member.model == "ifs-nemo-er":
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
-        elif "HadGEM" in member.model:
+        elif "hadgem3" in member.model:
             basedir = Path("/work/bm1344/DKRZ/MOHC")
         else:
             raise RuntimeError
