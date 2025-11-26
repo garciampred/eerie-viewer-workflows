@@ -8,12 +8,14 @@ import xarray
 
 from eerieview.cdo import cdo_regrid
 from eerieview.cmor import get_raw_variable_name, to_cmor_names
-from eerieview.constants import futuremember2hist
+from eerieview.constants import OCEAN_VARIABLES, futuremember2hist
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import (
+    CmorEerieMember,
     DecadalProduct,
     EERIEMember,
     InputLocation,
+    Member,
     PeriodsConfig,
     TimeFilter,
 )
@@ -100,6 +102,7 @@ def get_model_decadal_product(
     experiment: str = "control",
     clobber: bool = False,
     get_entry_dataset_fun=get_entry_dataset,
+    member_class: Member = EERIEMember,
 ) -> Path:
     """Compute and save decadal products (e.g., climatologies, trends) for a given variable.
 
@@ -143,15 +146,20 @@ def get_model_decadal_product(
 
     # Iterate over each model member
     for member_str in members:
+        member_obj = member_class.from_string(member_str)
         # Rename the member string based on variable realm
-        member = rename_realm(member_str, varname)
+        if varname in OCEAN_VARIABLES:
+            member_obj = member_obj.to_ocean()
+            member_str = member_obj.to_string()
         # Get the raw variable name from the CMOR mapping
-        rawname = get_raw_variable_name(member, varname)
+        if isinstance(member_obj, CmorEerieMember):
+            rawname = varname
+        else:
+            rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(
             catalogue,
             get_entry_dataset_fun,
             location,
-            member,
             member_str,
             rawname,
             varname,
@@ -163,7 +171,7 @@ def get_model_decadal_product(
         dataset_cmor = fix_units(dataset_cmor, varname, product)
 
         # Get the standardized member slug for dimension naming
-        final_member = EERIEMember.from_string(member.replace("ocean", "atmos")).slug
+        final_member = member_class.from_string(member.replace("ocean", "atmos")).slug
 
         # Iterate through each time filter and period
         for time_filter in time_filters:
@@ -220,13 +228,13 @@ def get_model_decadal_product(
 
 
 def get_complete_input_dataset(
-    catalogue, get_entry_dataset_fun, location, member, member_str, rawname, varname
+    catalogue, get_entry_dataset_fun, location, member, rawname, varname
 ):
     if "future" in member:
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        member_hist = futuremember2hist[member_str]
+        member_hist = futuremember2hist[member]
         member_hist = rename_realm(member_hist, varname)
         dataset_hist, _, rawname = get_member_dataset(
             catalogue,

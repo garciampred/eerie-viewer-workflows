@@ -27,6 +27,13 @@ ignore_missing_imports = true
 namespace_packages = false
 strict = false
 
+[tool.pytest.ini_options]
+log_cli = true
+log_level = "INFO"
+norecursedirs = [
+  'tests/docker'
+]
+
 [tool.ruff]
 # Same as Black.
 indent-width = 4

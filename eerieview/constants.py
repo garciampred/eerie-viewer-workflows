@@ -1,29 +1,57 @@
-location2prefix = dict(cloud="dkrz.cloud", levante="dkrz.disk.model-output")
+location2prefix = dict(
+    cloud="dkrz.cloud", levante="dkrz.disk.model-output", levante_cmor="dkrz.disk.CMOR"
+)
 members_eerie_control = [
     "icon-esm-er.eerie-control-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.atmos.gr025.2D_monthly_avg",
-    "hadgem3-gc5-n640-orca1.eerie-picontrol.atmos.gr025.daily",
-    "hadgem3-gc5-n640-orca12.eerie-picontrol.atmos.gr025.daily",
-    "hadgem3-gc5-n216-orca025.eerie-picontrol.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca1.eerie-picontrol.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.eerie-picontrol.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.eerie-picontrol.v20250425.atmos.gr025.daily",
 ]
 members_eerie_hist = [
     "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
-    "hadgem3-gc5-n640-orca1.hist-1950.atmos.gr025.daily",
-    "hadgem3-gc5-n640-orca12.hist-1950.atmos.gr025.daily",
-    "hadgem3-gc5-n216-orca025.hist-1950.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca1.hist-1950.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.hist-1950.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.hist-1950.v20250425.atmos.gr025.daily",
 ]
 
 members_eerie_future = [
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025",
-    "hadgem3-gc5-n640-orca1.highres-future-ssp245.atmos.gr025.daily",
-    "hadgem3-gc5-n640-orca12.highres-future-ssp245.atmos.gr025.daily",
-    "hadgem3-gc5-n216-orca025.highres-future-ssp245.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca1.highres-future-ssp245.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.highres-future-ssp245.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.highres-future-ssp245.v20250425.atmos.gr025.daily",
 ]
 
+members_eerie_control_cmor = [
+    "ifs-nemo-er.hist-1950.v20250516.gr025.Amon",
+    "icon-esm-er.eerie-control-1950.v20240618.gr025.Amon",
+    "ifs-fesom2-sr.eerie-control-1950.v20240304.gr025.Amon",
+    "hadgem3-gc5-n640-orca1.eerie-picontrol.v20250425.gr025.Amon",
+    "hadgem3-gc5-n640-orca12.eerie-picontrol.v20250425.gr025.Amon",
+    "hadgem3-gc5-n216-orca025.eerie-picontrol.v20250425.gr025.Amon",
+]
+
+members_eerie_hist_cmor = [
+    "ifs-fesom2-sr.hist-1950.v20240304.gr025.Amon",
+    "icon-esm-er.hist-1950.v20240618.gr025.Amon",
+    "ifs-nemo-er.hist-1950.v20250516.gr025.Amon",
+    "hadgem3-gc5-n640-orca1.hist-1950.v20250425.gr025.Amon",
+    "hadgem3-gc5-n640-orca12.hist-1950.v20250425.gr025.Amon",
+    "hadgem3-gc5-n216-orca025.hist-1950.v20250425.gr025.Amon",
+]
+
+members_eerie_future_cmor = [
+    "ifs-fesom2-sr.highres-future-ssp245.v20240304.gr025.Amon",
+    "icon-esm-er.highres-future-ssp245.v20240618.gr025.Amon",
+    "ifs-nemo-er.highres-future-ssp245.v20250516.gr025.Amon",
+    "hadgem3-gc5-n640-orca1.highres-future-ssp245.v20250425.gr025.Amon",
+    "hadgem3-gc5-n640-orca12.highres-future-ssp245.v20250425.gr025.Amon",
+    "hadgem3-gc5-n216-orca025.highres-future-ssp245.v20250425.gr025.Amon",
+]
 futuremember2hist = {
     hist: future for hist, future in zip(members_eerie_hist, members_eerie_future)
 }

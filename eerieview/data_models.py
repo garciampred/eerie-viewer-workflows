@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+import copy
+from dataclasses import dataclass, fields
 from pathlib import Path
-from typing import Literal, Tuple
+from typing import ClassVar, Literal, Tuple
 
 from eerieview.constants import NUM2MONTH
 
@@ -11,25 +12,52 @@ Period = Tuple[int, int]
 
 
 @dataclass
-class EERIEMember:
-    # 'ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg'
+class Member:
     model: str
     simulation: str
     version: str
-    realm: str
     grid: str
-    freq: str
+    npieces: ClassVar[int] = 4
 
     @classmethod
-    def from_string(cls, member_str: str) -> "EERIEMember":
+    def from_string(cls, member_str: str) -> "Member":
         pieces = member_str.split(".")
-        if len(pieces) != 6:
-            raise RuntimeError("Member string must have 6 sections separated by points")
+        if len(pieces) != cls.npieces:
+            raise RuntimeError(
+                f"Member string must have {cls.npieces} sections separated by points"
+            )
         return cls(*pieces)
 
     @property
     def slug(self) -> str:
         return f"{self.model}-{self.simulation}"
+
+    def to_string(self) -> str:
+        return ".".join(str(getattr(self, f.name)) for f in fields(self))
+
+    def to_ocean(self):
+        raise NotImplementedError
+
+
+@dataclass
+class EERIEMember(Member):
+    # 'ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg'
+    realm: str
+    freq: str
+    npieces: ClassVar[int] = 6
+
+    def to_ocean(self) -> "EERIEMember":
+        return copy.replace(self, realm="ocean")
+
+
+@dataclass
+class CmorEerieMember(Member):
+    # 'ifs-nemo-er.hist-1950.v20250516.gr025.Amon'
+    cmor_table: str
+    npieces: ClassVar[int] = 5
+
+    def to_ocean(self) -> "CmorEerieMember":
+        return copy.replace(self, cmor_table=self.cmor_table.replace("A", "O"))
 
 
 @dataclass
