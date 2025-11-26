@@ -370,7 +370,7 @@ def retry_get_entry_with_fixes(
         # Retry getting the dataset with the applied fixes
         dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
     elif isinstance(member, CmorEerieMember):
-        if EERIEMember.model == "ifs-nemo-er":
+        if member.model == "ifs-nemo-er":
             # Read from files
             # base : /work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER/
             # dirs : hist-1950/r1i1p1f1/Amon/tasmax/gr/v20250516/
