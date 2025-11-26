@@ -389,7 +389,13 @@ def retry_get_entry_with_fixes(
         dataset = xarray.open_mfdataset(paths_to_read)
     else:
         raise RuntimeError(f"Unknown member type {member}")
-
+    vars_to_drop = [
+        "forecast_period",
+        "forecast_period_bnds",
+        "forecast_period",
+        "time_bnds",
+    ]
+    dataset = dataset.squeeze().drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname
 
 
