@@ -370,24 +370,19 @@ def retry_get_entry_with_fixes(
         # Retry getting the dataset with the applied fixes
         dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)
     elif isinstance(member, CmorEerieMember):
+        # Read from files
         if member.model == "ifs-nemo-er":
-            # Read from files
-            # base : /work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER/
-            # dirs : hist-1950/r1i1p1f1/Amon/tasmax/gr/v20250516/
-            # filename: tasmax_Amon_IFS-NEMO-ER_hist-1950_r1i1p1f1_gr_200801-200806.nc
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
-            dirs = (
-                f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/gr/"
-                f"{member.version}/"
-            )
-            path_pattern = Path(basedir, dirs, f"{varname}*.nc")
-            dataset = xarray.open_mfdataset(path_pattern)
         elif "HadGEM" in member.model:
-            # read HadGEM
-            pass
+            basedir = Path("/work/bm1344/DKRZ/MOHC")
         else:
             raise RuntimeError
-
+        dirs = (
+            f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/gr/"
+            f"{member.version}/"
+        )
+        path_pattern = Path(basedir, dirs, f"{varname}*.nc")
+        dataset = xarray.open_mfdataset(path_pattern)
     else:
         raise RuntimeError
 

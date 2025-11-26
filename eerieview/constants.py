@@ -12,9 +12,9 @@ members_eerie_hist = [
     "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
     "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
-    "hadgem3-gc5-n640-orca1.hist-1950.v20250425.atmos.gr025.daily",
-    "hadgem3-gc5-n640-orca12.hist-1950.v20250425.atmos.gr025.daily",
-    "hadgem3-gc5-n216-orca025.hist-1950.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca1.eerie-historical.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n640-orca12.eerie-historical.v20250425.atmos.gr025.daily",
+    "hadgem3-gc5-n216-orca025.eerie-historical.v20250425.atmos.gr025.daily",
 ]
 
 members_eerie_future = [
