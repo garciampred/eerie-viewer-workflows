@@ -5,7 +5,7 @@ import intake
 import xarray
 
 from eerieview.constants import location2prefix
-from eerieview.data_models import EERIEMember, InputLocation
+from eerieview.data_models import EERIEMember, InputLocation, Member
 from eerieview.logger import get_logger
 
 logger = get_logger(__name__)
@@ -39,7 +39,7 @@ def to_dask(catalogue_entry, **kwargs):
 
 def get_entry_dataset(
     catalogue: intake.Catalog,  # Changed type hint from 'str' to 'intake.Catalog' for accuracy
-    member: str,
+    member: Member,
     rawname: str,
     location: InputLocation,
     to_dask_funct=to_dask,
@@ -52,8 +52,8 @@ def get_entry_dataset(
     ----------
     catalogue : intake.Catalog
         The Intake catalogue object.
-    member : str
-        The name of the model member (e.g., 'eerie-hist-1').
+    member : Member
+        The EERIE ensemble member as a Member instance.
     rawname : str
         The raw variable name in the dataset.
     location : InputLocation
@@ -68,12 +68,12 @@ def get_entry_dataset(
     """
     logger.info(f"Read EERIE member {member} to an xarray Dataset.")
     location_prefix = location2prefix[location]
-    member = location_prefix + "." + member
-    catalogue_entry = catalogue[member](method="kerchunk")  # type: ignore
+    member_str = location_prefix + "." + member.to_string()
+    catalogue_entry = catalogue[member_str](method="kerchunk")  # type: ignore
     dataset = to_dask_funct(catalogue_entry)
 
-    if "control" in member and "fesom" not in member:
-        member_spin_up = member.replace("control", "spinup")
+    if "control" in member_str and "fesom" not in member_str:
+        member_spin_up = member_str.replace("control", "spinup")
         print(f"Reading spinup from {member_spin_up}")
         dataset_spin_up = to_dask_funct(catalogue[member_spin_up])
         dataset = xarray.concat([dataset_spin_up, dataset], dim="time")
@@ -84,7 +84,9 @@ def get_entry_dataset(
         dataset = dataset.set_index(value=("lat", "lon")).unstack("value")
     logger.info(dataset)
     time_index = dataset.time.to_index()
-    logger.info(f"Time span for {member} is from {time_index[0]} to {time_index[-1]}.")
+    logger.info(
+        f"Time span for {member_str} is from {time_index[0]} to {time_index[-1]}."
+    )
     return dataset
 
 
