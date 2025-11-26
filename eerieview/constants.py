@@ -9,18 +9,18 @@ members_eerie_control = [
     "hadgem3-gc5-n216-orca025.eerie-picontrol.v20250425.atmos.gr025.daily",
 ]
 members_eerie_hist = [
+    "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
     "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
-    "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
     "hadgem3-gc5-n640-orca1.hist-1950.v20250425.atmos.gr025.daily",
     "hadgem3-gc5-n640-orca12.hist-1950.v20250425.atmos.gr025.daily",
     "hadgem3-gc5-n216-orca025.hist-1950.v20250425.atmos.gr025.daily",
 ]
 
 members_eerie_future = [
-    "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
-    "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025",
+    "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
+    "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
     "hadgem3-gc5-n640-orca1.highres-future-ssp245.v20250425.atmos.gr025.daily",
     "hadgem3-gc5-n640-orca12.highres-future-ssp245.v20250425.atmos.gr025.daily",
     "hadgem3-gc5-n216-orca025.highres-future-ssp245.v20250425.atmos.gr025.daily",
