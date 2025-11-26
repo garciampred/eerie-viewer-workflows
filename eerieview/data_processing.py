@@ -1,3 +1,4 @@
+import copy
 import importlib
 from datetime import datetime
 from itertools import chain
@@ -9,7 +10,14 @@ import xarray
 import xarray_regrid  # noqa: F401 # Imported for its side effects (adds .regrid accessor)
 
 from eerieview.constants import OCEAN_VARIABLES
-from eerieview.data_models import EERIEProduct, InputLocation, PeriodsConfig, TimeFilter
+from eerieview.data_models import (
+    CmorEerieMember,
+    EERIEProduct,
+    InputLocation,
+    Member,
+    PeriodsConfig,
+    TimeFilter,
+)
 from eerieview.exceptions import EmptySliceError
 from eerieview.logger import get_logger
 from eerieview.regions import SpatialAggregation
@@ -449,17 +457,26 @@ def fix_units(
     return dataset
 
 
-def rename_realm(member: str, varname: str) -> str:
+def rename_realm(member: Member, varname: str) -> Member:
     """Adjust the member string based on the variable's realm (e.g., atmos to ocean)."""
     # For ocean variables, change 'atmos' to 'ocean' in member string
-    if varname in OCEAN_VARIABLES and "amip" not in member:
-        member = member.replace("atmos", "ocean")
+    if (
+        varname in OCEAN_VARIABLES
+        and "amip" != member.simulation
+        and not isinstance(member, CmorEerieMember)
+    ):
+        member = copy.replace(member, realm="ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
-        if "ifs-fesom2-sr" in member and ("hist" in member or "control" in member):
-            member = member.replace("monthly", "daily")
-            member += "_1950-2014"
+        if "ifs-fesom2-sr" == member.model and (
+            "hist" in member.simulation or "control" in member.simulation
+        ):
+            member = copy.replace(member, freq="daily_1950-2014")
     # Adjust member string for ICON tasmax/tasmin variables
-    if "icon" in member and varname in ["tasmax", "tasmin"]:
+    if (
+        "icon" in member.model
+        and varname in ["tasmax", "tasmin"]
+        and not isinstance(member, CmorEerieMember)
+    ):
         extreme = "max" if varname == "tasmax" else "min"
-        member = member.replace("monthly_mean", f"daily_{extreme}")
+        member = copy.replace(member, freq=f"daily_{extreme}")
     return member

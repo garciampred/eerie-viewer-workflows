@@ -1,14 +1,16 @@
+import copy
 from datetime import datetime
 from functools import reduce
 from pathlib import Path
+from typing import Callable
 
 import dask
+import intake
 import numpy
 import xarray
 
-from eerieview.cdo import cdo_regrid
 from eerieview.cmor import get_raw_variable_name, to_cmor_names
-from eerieview.constants import OCEAN_VARIABLES, futuremember2hist
+from eerieview.constants import OCEAN_VARIABLES
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import (
     CmorEerieMember,
@@ -160,7 +162,7 @@ def get_model_decadal_product(
             catalogue,
             get_entry_dataset_fun,
             location,
-            member_str,
+            member_obj,
             rawname,
             varname,
         )
@@ -171,7 +173,7 @@ def get_model_decadal_product(
         dataset_cmor = fix_units(dataset_cmor, varname, product)
 
         # Get the standardized member slug for dimension naming
-        final_member = member_class.from_string(member.replace("ocean", "atmos")).slug
+        final_member = member.slug
 
         # Iterate through each time filter and period
         for time_filter in time_filters:
@@ -189,17 +191,11 @@ def get_model_decadal_product(
                 dataset_product = fix_coords(dataset_cmor_filtered, dataset_product)
                 # Remove problematic attributes from the dataset
                 dataset_product = delete_wrong_attrs(dataset_product)
-
-                # Regrid the dataset based on member type (native grid or common grid)
-                if "native" in member:
-                    dataset_product = cdo_regrid(dataset_product, member)
-                else:
-                    grid_dataset = get_grid_dataset(
-                        0.25
-                    )  # Get a 0.25 degree target grid
-                    dataset_product = dataset_product.regrid.conservative(
-                        grid_dataset, latitude_coord="lon"
-                    )
+                # Get a 0.25 degree target grid
+                grid_dataset = get_grid_dataset(0.25)
+                dataset_product = dataset_product.regrid.conservative(
+                    grid_dataset, latitude_coord="lon"
+                )
 
                 # Define extra dimensions for metadata (member, time filter, period)
                 dataset_product = define_extra_dimensions(
@@ -228,13 +224,18 @@ def get_model_decadal_product(
 
 
 def get_complete_input_dataset(
-    catalogue, get_entry_dataset_fun, location, member, rawname, varname
-):
-    if "future" in member:
+    catalogue: intake.Catalog,
+    get_entry_dataset_fun: Callable,
+    location: InputLocation,
+    member: Member,
+    rawname: str,
+    varname: str,
+) -> tuple[xarray.Dataset, Member, str]:
+    if "future" in member.simulation:
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        member_hist = futuremember2hist[member]
+        member_hist = copy.replace(member, simulation="hist-1950")
         member_hist = rename_realm(member_hist, varname)
         dataset_hist, _, rawname = get_member_dataset(
             catalogue,
@@ -253,8 +254,13 @@ def get_complete_input_dataset(
 
 
 def get_member_dataset(
-    catalogue, get_entry_dataset_fun, location, member, rawname, varname
-):
+    catalogue: intake.Catalog,
+    get_entry_dataset_fun: Callable,
+    location: InputLocation,
+    member: Member,
+    rawname: str,
+    varname: str,
+) -> tuple[xarray.Dataset, Member, str]:
     try:
         # Attempt to retrieve the dataset for the current member and variable
         dataset = get_entry_dataset_fun(catalogue, member, rawname, location=location)

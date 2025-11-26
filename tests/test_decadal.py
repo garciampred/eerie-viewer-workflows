@@ -2,8 +2,8 @@ from functools import partial
 
 import pytest
 
-from eerieview.constants import members_eerie_control
-from eerieview.data_models import EERIEMember, PeriodsConfig
+from eerieview.constants import members_eerie_control_cmor
+from eerieview.data_models import CmorEerieMember, PeriodsConfig
 from eerieview.product_computation import get_model_decadal_product
 from scripts.get_obs_climatologies import get_obs_decadal_product
 from tests.conftest import mocked_get_entry_dataset, mocked_get_obs_dataset
@@ -30,8 +30,8 @@ def test_get_model_decadal_product(tmp_path, varname, product):
         product=product,
         get_entry_dataset_fun=_mocked_get_entry_dataset,
         periods=periods_config,
-        members=members_eerie_control,
-        member_class=EERIEMember,
+        members=members_eerie_control_cmor,
+        member_class=CmorEerieMember,
     )
     print(dataset)
 
