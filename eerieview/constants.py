@@ -39,9 +39,9 @@ members_eerie_hist_cmor = [
     "ifs-fesom2-sr.hist-1950.v20240304.gr025.Amon",
     "icon-esm-er.hist-1950.v20240618.gr025.Amon",
     "ifs-nemo-er.hist-1950.v20250516.gr025.Amon",
-    "hadgem3-gc5-n640-orca1.hist-1950.v20250425.gr025.Amon",
-    "hadgem3-gc5-n640-orca12.hist-1950.v20250425.gr025.Amon",
-    "hadgem3-gc5-n216-orca025.hist-1950.v20250425.gr025.Amon",
+    "hadgem3-gc5-n640-orca1.eerie-historical.v20250425.gr025.Amon",
+    "hadgem3-gc5-n640-orca12.eerie-historical.v20250425.gr025.Amon",
+    "hadgem3-gc5-n216-orca025.eerie-historical.v20250425.gr025.Amon",
 ]
 
 members_eerie_future_cmor = [

@@ -374,9 +374,9 @@ def retry_get_entry_with_fixes(
         if member.model == "ifs-nemo-er":
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
         elif "hadgem3" in member.model:
-            basedir = Path("/work/bm1344/DKRZ/MOHC")
+            basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
         else:
-            raise RuntimeError
+            raise RuntimeError(f"Unkown model: {member.model}")
         dirs = (
             f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/gr/"
             f"{member.version}/"
@@ -384,7 +384,7 @@ def retry_get_entry_with_fixes(
         path_pattern = Path(basedir, dirs, f"{varname}*.nc")
         dataset = xarray.open_mfdataset(path_pattern)
     else:
-        raise RuntimeError
+        raise RuntimeError(f"Unknown member type {member}")
 
     return dataset, member, rawname
 
