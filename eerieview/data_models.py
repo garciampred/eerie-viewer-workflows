@@ -5,7 +5,7 @@ from typing import ClassVar, Literal, Tuple
 
 from eerieview.constants import NUM2MONTH
 
-InputLocation = Literal["levante", "cloud"]
+InputLocation = Literal["levante", "cloud", "levante_cmor"]
 DecadalProduct = Literal["clim", "trend"]
 EERIEProduct = Literal["series"] | DecadalProduct
 Period = Tuple[int, int]

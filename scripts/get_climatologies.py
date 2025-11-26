@@ -4,10 +4,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from eerieview.constants import (
-    members_eerie_control,
-    members_eerie_future,
-    members_eerie_hist,
+    members_eerie_control_cmor,
+    members_eerie_future_cmor,
     members_eerie_hist_amip,
+    members_eerie_hist_cmor,
 )
 from eerieview.data_access import get_diagnostic, get_entry_dataset
 from eerieview.data_models import (
@@ -48,7 +48,7 @@ for different experimental setups (control, historical, AMIP).
 
 
 def main_control(product: DecadalProduct):
-    location: InputLocation = "levante"
+    location: InputLocation = "levante_cmor"
     reference_period = (1951, 1980)
     periods = [(1951, 1980), (1971, 2000), (1991, 2020), (2021, 2050)]
     periods_config = PeriodsConfig(reference_period, periods)
@@ -64,7 +64,7 @@ def main_control(product: DecadalProduct):
         get_model_decadal_product(
             varname=varname,
             output_dir=output_dir,
-            members=members_eerie_control,
+            members=members_eerie_control_cmor,
             periods=periods_config,
             product=product,
             experiment="control",
@@ -75,12 +75,12 @@ def main_control(product: DecadalProduct):
 
 
 def main_future(product: DecadalProduct):
-    location: InputLocation = "levante"
+    location: InputLocation = "levante_cmor"
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020), (2021, 2050)]
     if product == "trend":
         periods += (1951, 2050)
-    members = members_eerie_future
+    members = members_eerie_future_cmor
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
 
@@ -105,10 +105,10 @@ def main_future(product: DecadalProduct):
 
 
 def main_hist(product: DecadalProduct):
-    location: InputLocation = "levante"
+    location: InputLocation = "levante_cmor"
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020)]
-    members = members_eerie_hist
+    members = members_eerie_hist_cmor
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
 
