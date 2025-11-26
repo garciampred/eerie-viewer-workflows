@@ -388,7 +388,13 @@ def retry_get_entry_with_fixes(
         path_with_files = Path(basedir, dirs)
         paths_to_read = sorted(path_with_files.glob(f"{varname}*.nc"))
         logger.info(f"Reading {paths_to_read}")
-        dataset = xarray.open_mfdataset(paths_to_read)
+        dataset = xarray.open_mfdataset(
+            paths_to_read,
+            concat_dim="time",
+            combine="nested",
+            coords="minimal",
+            data_vars="minimal",
+        )
     else:
         raise RuntimeError(f"Unknown member type {member}")
     vars_to_drop = [
