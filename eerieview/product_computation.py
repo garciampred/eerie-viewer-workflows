@@ -367,7 +367,10 @@ def get_model_time_series(
             member_obj = member_obj.to_ocean()
             member_str = member_obj.to_string()
         # Get the raw variable name as it appears in the source files.
-        rawname = get_raw_variable_name(member_str, varname)
+        if isinstance(member_obj, CmorEerieMember):
+            rawname = varname
+        else:
+            rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(
             catalogue,
             get_entry_dataset_fun,
