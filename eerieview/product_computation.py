@@ -369,6 +369,8 @@ def get_model_time_series(
         # Get the raw variable name as it appears in the source files.
         if isinstance(member_obj, CmorEerieMember):
             rawname = varname
+            if varname in ["tasmax", "tasmin"] and "icon" in member_obj.model:
+                member_obj = copy.replace(member_obj, cmor_table="day")
         else:
             rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(

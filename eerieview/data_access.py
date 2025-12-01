@@ -72,7 +72,7 @@ def get_entry_dataset(
     catalogue_entry = catalogue[member_str](method="kerchunk")  # type: ignore
     dataset = to_dask_funct(catalogue_entry)
 
-    if "control" in member_str and "fesom" not in member_str:
+    if "control" in member_str and "fesom" not in member_str and isinstance(member, EERIEMember):
         member_spin_up = member_str.replace("control", "spinup")
         print(f"Reading spinup from {member_spin_up}")
         dataset_spin_up = to_dask_funct(catalogue[member_spin_up])

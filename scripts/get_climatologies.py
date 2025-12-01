@@ -36,7 +36,6 @@ VARIABLES = [
     "clt",
     "tasmax",
     "tasmin",
-    "so",
     "eke",
 ]
 
@@ -161,7 +160,7 @@ def main_amip():
 
 
 if __name__ == "__main__":
-    main_future("clim")
-    main_future("trend")
-    main_control("clim")
-    main_control("trend")
+    main_hist("clim")
+    main_hist("trend")
+    #main_control("clim")
+    #main_control("trend")

@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 
 def get_exp_time_series(experiment: str, region_set: str):
     """Run the time series generation process for specific model experiments and variables."""
-    location: InputLocation = "levante"
+    location: InputLocation = "levante_cmor"
     exp2ref_period = {
         "hist-amip": (1981, 2000),
         "hist": (1951, 1980),
@@ -45,9 +45,9 @@ def get_exp_time_series(experiment: str, region_set: str):
         "vas",
         "tas",
         "pr",
-        #        "tos",
+        "tos",
         "clt",
-        #        "zos",
+        "zos",
         "tasmax",
         "tasmin",
         #       "eke",
@@ -86,7 +86,7 @@ def get_exp_time_series(experiment: str, region_set: str):
 
 def main():
     region_sets = ["IPCC", "EDDY"]
-    experiments = ["control", "hist"]  # ["control", "hist", "hist-amip", "future"]
+    experiments = ["hist", ]  # "control"]  # ["control", "hist", "hist-amip", "future"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)
