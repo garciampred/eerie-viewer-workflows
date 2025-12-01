@@ -11,12 +11,12 @@ from dotenv import load_dotenv
 
 from eerieview.cmor import get_raw_variable_name, to_cmor_names
 from eerieview.constants import (
-    members_eerie_control,
-    members_eerie_future,
-    members_eerie_hist,
+    members_eerie_control_cmor,
+    members_eerie_future_cmor,
+    members_eerie_hist_cmor,
 )
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
-from eerieview.data_models import InputLocation, Member
+from eerieview.data_models import CmorEerieMember, InputLocation, Member
 from eerieview.data_processing import rename_realm
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
@@ -74,15 +74,18 @@ def main():
     print(cluster)
     client = Client(cluster)
     print("Dashboard URL:", client.dashboard_link)
-    location: InputLocation = "levante"
-    all_members = members_eerie_future + members_eerie_hist + members_eerie_control
+    location: InputLocation = "levante_cmor"
+    all_members = (
+        members_eerie_future_cmor + members_eerie_hist_cmor + members_eerie_control_cmor
+    )
     all_members = ["ifs-nemo-er.hist-1950.v20250516.atmos.gr025"]
-    for member in all_members:
-        logger.info(f"Computing monthly EKE for {member}")
+    for member_str in all_members:
+        logger.info(f"Computing monthly EKE for {member_str}")
         try:
+            member = CmorEerieMember.from_string(member_str)
             compute_eke_for_member(member, location)
         except Exception as e:
-            logger.warning(f"EKE computation failed for {member} with error {e}")
+            logger.warning(f"EKE computation failed for {member_str} with error {e}")
 
 
 if __name__ == "__main__":
