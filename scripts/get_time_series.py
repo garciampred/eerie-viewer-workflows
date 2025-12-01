@@ -7,11 +7,11 @@ from dotenv import load_dotenv
 from eerieview.constants import (
     members_eerie_control_cmor,
     members_eerie_future_cmor,
-    members_eerie_hist_cmor,
     members_eerie_hist_amip,
+    members_eerie_hist_cmor,
 )
 from eerieview.data_access import get_diagnostic, get_entry_dataset
-from eerieview.data_models import InputLocation
+from eerieview.data_models import CmorEerieMember, InputLocation
 from eerieview.logger import get_logger
 from eerieview.product_computation import get_model_time_series
 
@@ -45,12 +45,12 @@ def get_exp_time_series(experiment: str, region_set: str):
         "vas",
         "tas",
         "pr",
-#        "tos",
+        #        "tos",
         "clt",
-#        "zos",
+        #        "zos",
         "tasmax",
         "tasmin",
- #       "eke",
+        #       "eke",
     ]
 
     # Iterate through each variable to process.
@@ -80,14 +80,13 @@ def get_exp_time_series(experiment: str, region_set: str):
             region_set,
             clobber=False,
             get_entry_dataset_fun=get_entry_dataset_fun,
+            member_class=CmorEerieMember,
         )
 
 
 def main():
     region_sets = ["IPCC", "EDDY"]
-    experiments = [
-        "control", "hist"
-    ]  # ["control", "hist", "hist-amip", "future"]
+    experiments = ["control", "hist"]  # ["control", "hist", "hist-amip", "future"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)
