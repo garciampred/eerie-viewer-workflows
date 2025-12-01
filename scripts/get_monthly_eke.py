@@ -2,7 +2,7 @@
 
 This needs significant resources (especially memory), try with 64G or 128G
 """
-
+import copy
 import os
 from pathlib import Path
 
@@ -36,8 +36,8 @@ def compute_eke_for_member(
     # Input data must be daily and ocean
     member = member.to_daily().to_ocean()
     member_str = member.to_string()
-    if "ICON" in member.model:
-        member.cmor_table = "HROday"
+    if "ifs-nemo" in member.model:
+        member = copy.replace(member, cmor_table="HROday")
     # Get intermediate and final file names
     final_member = member.to_atmos().slug
     output_path = Path(output_dir, f"eke_{final_member}_monthly.nc")
