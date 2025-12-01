@@ -78,14 +78,15 @@ def main():
     all_members = (
         members_eerie_future_cmor + members_eerie_hist_cmor + members_eerie_control_cmor
     )
-    all_members = ["ifs-nemo-er.hist-1950.v20250516.atmos.gr025"]
+    all_members = ["ifs-nemo-er.hist-1950.v20250516.gr025.Amon"]
     for member_str in all_members:
         logger.info(f"Computing monthly EKE for {member_str}")
         try:
             member = CmorEerieMember.from_string(member_str)
             compute_eke_for_member(member, location)
         except Exception as e:
-            logger.warning(f"EKE computation failed for {member_str} with error {e}")
+            raise
+            #            logger.warning(f"EKE computation failed for {member_str} with error {e}")
 
 
 if __name__ == "__main__":
