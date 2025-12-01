@@ -17,7 +17,6 @@ from eerieview.constants import (
 )
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import CmorEerieMember, InputLocation, Member
-from eerieview.data_processing import rename_realm
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
 from eerieview.logger import get_logger
@@ -35,8 +34,7 @@ def compute_eke_for_member(
     varname = "zos"
     output_dir = os.environ["DIAGSDIR"]
     # Input data must be daily and ocean
-    member = member.to_daily()
-    member = rename_realm(member, varname)
+    member = member.to_daily().to_ocean()
     member_str = member.to_string()
     # Get intermediate and final file names
     final_member = member.to_atmos().slug
@@ -50,10 +48,13 @@ def compute_eke_for_member(
     else:
         # Open the catalogue entry
         catalogue = get_main_catalogue()
-        rawname = get_raw_variable_name(member_str, varname)
-        dataset = get_entry_dataset(
-            catalogue, member, rawname, location=location
-        ).chunk(dict(time=1000, lat=100, lon=100))
+        if isinstance(member, CmorEerieMember):
+            rawname = varname
+        else:
+            rawname = get_raw_variable_name(member_str, varname)
+            dataset = get_entry_dataset(
+                catalogue, member, rawname, location=location
+            ).chunk(dict(time=1000, lat=100, lon=100))
         # Rename to CMOR names
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
 
