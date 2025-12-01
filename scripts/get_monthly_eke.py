@@ -17,6 +17,7 @@ from eerieview.constants import (
 )
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import CmorEerieMember, InputLocation, Member
+from eerieview.data_processing import retry_get_entry_with_fixes
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
 from eerieview.logger import get_logger
@@ -54,9 +55,15 @@ def compute_eke_for_member(
             rawname = varname
         else:
             rawname = get_raw_variable_name(member_str, varname)
-        dataset = get_entry_dataset(
-            catalogue, member, rawname, location=location
-        ).chunk(dict(time=1000, lat=100, lon=100))
+        try:
+            # Attempt to retrieve the dataset for the current member and variable
+            dataset = get_entry_dataset(catalogue, member, rawname, location=location)
+        except KeyError:
+            # If a KeyError occurs, retry with common fixes
+            dataset, member, rawname = retry_get_entry_with_fixes(
+                catalogue, get_entry_dataset, location, member, rawname, varname
+            )
+        dataset = dataset.chunk(dict(time=1000, lat=100, lon=100))
         # Rename to CMOR names
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
         # Run computation
