@@ -4,9 +4,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from eerieview.constants import (
-    members_eerie_control,
-    members_eerie_future,
-    members_eerie_hist,
+    members_eerie_control_cmor,
+    members_eerie_future_cmor,
+    members_eerie_hist_cmor,
     members_eerie_hist_amip,
 )
 from eerieview.data_access import get_diagnostic, get_entry_dataset
@@ -29,9 +29,9 @@ def get_exp_time_series(experiment: str, region_set: str):
     }
     exp2members = {
         "hist-amip": members_eerie_hist_amip,
-        "hist": members_eerie_hist,
-        "control": members_eerie_control,
-        "future": members_eerie_future,
+        "hist": members_eerie_hist_cmor,
+        "control": members_eerie_control_cmor,
+        "future": members_eerie_future_cmor,
     }
     members = exp2members[experiment]
     reference_period = exp2ref_period[experiment]
@@ -44,12 +44,12 @@ def get_exp_time_series(experiment: str, region_set: str):
         "vas",
         "tas",
         "pr",
-        "tos",
+#        "tos",
         "clt",
-        "zos",
+#        "zos",
         "tasmax",
         "tasmin",
-        "eke",
+ #       "eke",
     ]
 
     # Iterate through each variable to process.
@@ -84,8 +84,8 @@ def get_exp_time_series(experiment: str, region_set: str):
 def main():
     region_sets = ["IPCC", "EDDY"]
     experiments = [
-        "future",
-    ]  # ["control", "hist", "hist-amip"]
+        "control", "hist"
+    ]  # ["control", "hist", "hist-amip", "future"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)

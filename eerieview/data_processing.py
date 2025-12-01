@@ -379,15 +379,16 @@ def retry_get_entry_with_fixes(
             grid = "gr1"
             if rawname == "tos":
                 rawname = "toscon"
+                member = copy.replace(member, version="v20230928")
         else:
             raise RuntimeError(f"Unkown model: {member.model}")
         dirs = (
-            f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{varname}/{grid}/"
+            f"{member.simulation}/r1i1p1f1/{member.cmor_table}/{rawname}/{grid}/"
             f"{member.version}/"
         )
         path_with_files = Path(basedir, dirs)
-        paths_to_read = sorted(path_with_files.glob(f"{varname}*.nc"))
-        logger.info(f"Reading {paths_to_read}")
+        paths_to_read = sorted(path_with_files.glob(f"{rawname}*.nc"))
+        logger.info(f"{path_with_files}/{rawname}*.nc")
         dataset = xarray.open_mfdataset(
             paths_to_read,
             concat_dim="time",
