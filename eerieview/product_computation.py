@@ -128,6 +128,8 @@ def get_model_decadal_product(
         If True, overwrite existing output files. By default False.
     get_entry_dataset_fun : callable, optional
         Function to retrieve the initial dataset. By default `get_entry_dataset`.
+    member_class : Member, optional, default is EERIEMember
+        Member class to use.
 
     Returns
     -------
@@ -310,6 +312,7 @@ def get_model_time_series(
     region_set: str,
     get_entry_dataset_fun=get_entry_dataset,
     clobber: bool = False,
+    member_class: type[Member] = EERIEMember,
 ) -> Path:
     """Compute and save regional mean time series for a given model variable.
 
@@ -333,6 +336,8 @@ def get_model_time_series(
         A function to retrieve the initial dataset. Defaults to `get_entry_dataset`.
     clobber : bool, optional
         If True, overwrite existing output files. Defaults to False.
+    member_class : Member, optional, default is EERIEMember
+        Member class to use.
 
     Returns
     -------
@@ -356,23 +361,25 @@ def get_model_time_series(
     # Process each model member.
     for member_str in members:
         # Adjust the member string based on variable realm (e.g., 'atmos' to 'ocean').
-        member = rename_realm(member_str, varname)
+        member_obj = member_class.from_string(member_str)
+        # Rename the member string based on variable realm
+        if varname in OCEAN_VARIABLES:
+            member_obj = member_obj.to_ocean()
+            member_str = member_obj.to_string()
         # Get the raw variable name as it appears in the source files.
-        rawname = get_raw_variable_name(member, varname)
+        rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(
             catalogue,
             get_entry_dataset_fun,
             location,
-            member,
-            member_str,
+            member_obj,
             rawname,
             varname,
         )
         # Rename the raw variable to its CMOR-compliant name.
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
         # Convert the member string to a standardized slug for consistent dimension naming.
-        final_member = EERIEMember.from_string(member.replace("ocean", "atmos")).slug
-
+        final_member = member_obj.to_atmos().slug
         # Iterate through each time filter to generate different time series.
         for time_filter in time_filters:
             logger.info(

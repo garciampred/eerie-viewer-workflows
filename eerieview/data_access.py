@@ -80,7 +80,7 @@ def get_entry_dataset(
         dataset = dataset.sortby("time").drop_duplicates(dim="time")
 
     dataset = dataset[[rawname]].astype("float32")
-    if "lon" not in dataset.dims and "native" not in member:
+    if "lon" not in dataset.dims and "native" not in member_str:
         dataset = dataset.set_index(value=("lat", "lon")).unstack("value")
     logger.info(dataset)
     time_index = dataset.time.to_index()

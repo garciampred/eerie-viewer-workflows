@@ -35,7 +35,13 @@ class Member:
     def to_string(self) -> str:
         return ".".join(str(getattr(self, f.name)) for f in fields(self))
 
-    def to_ocean(self):
+    def to_ocean(self) -> "Member":
+        raise NotImplementedError
+
+    def to_atmos(self) -> "Member":
+        raise NotImplementedError
+
+    def to_daily(self) -> "Member":
         raise NotImplementedError
 
 
@@ -49,6 +55,12 @@ class EERIEMember(Member):
     def to_ocean(self) -> "EERIEMember":
         return copy.replace(self, realm="ocean")
 
+    def to_atmos(self) -> "EERIEMember":
+        return copy.replace(self, realm="atmos")
+
+    def to_daily(self) -> "EERIEMember":
+        return copy.replace(self, freq="daily")
+
 
 @dataclass
 class CmorEerieMember(Member):
@@ -58,6 +70,12 @@ class CmorEerieMember(Member):
 
     def to_ocean(self) -> "CmorEerieMember":
         return copy.replace(self, cmor_table=self.cmor_table.replace("A", "O"))
+
+    def to_atmos(self) -> "CmorEerieMember":
+        return copy.replace(self, cmor_table=self.cmor_table.replace("O", "A"))
+
+    def to_daily(self) -> "CmorEerieMember":
+        return copy.replace(self, cmor_table=self.cmor_table.replace("MON", "DAY"))
 
 
 @dataclass

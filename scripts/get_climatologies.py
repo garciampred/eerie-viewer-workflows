@@ -81,7 +81,9 @@ def main_future(product: DecadalProduct):
     reference_period = (1951, 1980)
     periods = [(1971, 2000), (1991, 2020), (2021, 2050)]
     if product == "trend":
-        periods += (1951, 2050)
+        periods += [
+            (1951, 2050),
+        ]
     members = members_eerie_future_cmor
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
