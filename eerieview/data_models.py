@@ -75,7 +75,7 @@ class CmorEerieMember(Member):
         return copy.replace(self, cmor_table=self.cmor_table.replace("O", "A"))
 
     def to_daily(self) -> "CmorEerieMember":
-        return copy.replace(self, cmor_table=self.cmor_table.replace("MON", "DAY"))
+        return copy.replace(self, cmor_table=self.cmor_table.replace("mon", "day"))
 
 
 @dataclass

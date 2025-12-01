@@ -36,6 +36,8 @@ def compute_eke_for_member(
     # Input data must be daily and ocean
     member = member.to_daily().to_ocean()
     member_str = member.to_string()
+    if "ICON" in member.model:
+        member.cmor_table = "HROday"
     # Get intermediate and final file names
     final_member = member.to_atmos().slug
     output_path = Path(output_dir, f"eke_{final_member}_monthly.nc")
@@ -52,12 +54,11 @@ def compute_eke_for_member(
             rawname = varname
         else:
             rawname = get_raw_variable_name(member_str, varname)
-            dataset = get_entry_dataset(
-                catalogue, member, rawname, location=location
-            ).chunk(dict(time=1000, lat=100, lon=100))
+        dataset = get_entry_dataset(
+            catalogue, member, rawname, location=location
+        ).chunk(dict(time=1000, lat=100, lon=100))
         # Rename to CMOR names
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
-
         # Run computation
         eke_monthly = compute_monthly_eke(
             dataset_cmor, daily_anom_zos_file, zos_daily_climatology_file
