@@ -16,7 +16,7 @@ from eerieview.constants import (
     members_eerie_hist,
 )
 from eerieview.data_access import get_entry_dataset, get_main_catalogue
-from eerieview.data_models import EERIEMember, InputLocation
+from eerieview.data_models import InputLocation, Member
 from eerieview.data_processing import rename_realm
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
@@ -29,14 +29,17 @@ import logging
 logging.getLogger("distributed").setLevel(logging.ERROR)
 
 
-def compute_eke_for_member(member: str, location: InputLocation, clobber: bool = False):
+def compute_eke_for_member(
+    member: Member, location: InputLocation, clobber: bool = False
+):
     varname = "zos"
     output_dir = os.environ["DIAGSDIR"]
     # Input data must be daily and ocean
-    member = member.replace("monthly", "daily")
+    member = member.to_daily()
     member = rename_realm(member, varname)
+    member_str = member.to_string()
     # Get intermediate and final file names
-    final_member = EERIEMember.from_string(member.replace("ocean", "atmos")).slug
+    final_member = member.to_atmos().slug
     output_path = Path(output_dir, f"eke_{final_member}_monthly.nc")
     zos_daily_climatology_file = Path(
         output_dir, f"zos_clim_{final_member}_dayofyear.nc"
@@ -47,7 +50,7 @@ def compute_eke_for_member(member: str, location: InputLocation, clobber: bool =
     else:
         # Open the catalogue entry
         catalogue = get_main_catalogue()
-        rawname = get_raw_variable_name(member, varname)
+        rawname = get_raw_variable_name(member_str, varname)
         dataset = get_entry_dataset(
             catalogue, member, rawname, location=location
         ).chunk(dict(time=1000, lat=100, lon=100))

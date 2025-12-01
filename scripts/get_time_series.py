@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Callable
 
 from dotenv import load_dotenv
 
@@ -61,6 +62,7 @@ def get_exp_time_series(experiment: str, region_set: str):
 
         # Determine the appropriate function to get the initial dataset.
         # 'eke' often requires a special diagnostic function.
+        get_entry_dataset_fun: Callable
         if varname in ["eke"]:
             get_entry_dataset_fun = get_diagnostic
         else:

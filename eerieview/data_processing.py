@@ -351,12 +351,11 @@ def retry_get_entry_with_fixes(
     member: Member,
     rawname: str,
     varname: str,
-) -> tuple[xarray.Dataset, str, str]:
+) -> tuple[xarray.Dataset, Member, str]:
     """Attempt to retrieve a dataset with common fixes if the initial attempt fails."""
     if isinstance(member, EERIEMember):
         member_str = member.to_string()
         member_str = member_str.replace("monthly", "daily")
-
         # Specific fixes for tasmax/tasmin with fesom
         if varname == "tasmax" and "fesom" in member_str:
             member_str = member_str.replace("avg", "max")
