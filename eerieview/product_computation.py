@@ -237,7 +237,7 @@ def get_complete_input_dataset(
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        if "hadgem" in member.model:
+        if "hadgem" in member.model.lower():
             member_hist = copy.replace(member, simulation="eerie-historical")
         else:
             member_hist = copy.replace(member, simulation="hist-1950")
