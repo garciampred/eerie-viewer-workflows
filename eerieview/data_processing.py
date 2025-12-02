@@ -379,8 +379,12 @@ def retry_get_entry_with_fixes(
             grid = "gr1"
             if rawname == "tos":
                 rawname = "toscon"
-            if rawname in ["toscon", "zos"]:
+            if rawname == "toscon":
                 member = copy.replace(member, version="v20251126")
+            elif rawname == "zos":
+                member = copy.replace(member, version="v20250425")
+            else:
+                pass
             pattern_to_expand = f"{rawname}_*.nc"
         else:
             raise RuntimeError(f"Unkown model: {member.model}")
@@ -406,7 +410,7 @@ def retry_get_entry_with_fixes(
         "forecast_period",
         "time_bnds",
         "lat_bnds",
-        "lon_bnds"
+        "lon_bnds",
     ]
     dataset = dataset.drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname
