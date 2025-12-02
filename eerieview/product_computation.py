@@ -233,7 +233,7 @@ def get_complete_input_dataset(
     rawname: str,
     varname: str,
 ) -> tuple[xarray.Dataset, Member, str]:
-    if "future" in member.simulation:
+    if "ssp245" in member.simulation:
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
