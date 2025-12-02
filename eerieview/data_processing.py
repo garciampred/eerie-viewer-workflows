@@ -373,6 +373,7 @@ def retry_get_entry_with_fixes(
         if member.model == "ifs-nemo-er":
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
             grid = "gr"
+            pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
             grid = "gr1"
@@ -380,6 +381,7 @@ def retry_get_entry_with_fixes(
                 rawname = "toscon"
             if rawname in ["toscon", "zos"]:
                 member = copy.replace(member, version="v20251126")
+            pattern_to_expand = f"{rawname}_*.nc"
         else:
             raise RuntimeError(f"Unkown model: {member.model}")
         dirs = (
@@ -387,8 +389,8 @@ def retry_get_entry_with_fixes(
             f"{member.version}/"
         )
         path_with_files = Path(basedir, dirs)
-        paths_to_read = sorted(path_with_files.glob(f"{rawname}*.nc"))
-        logger.info(f"{path_with_files}/{rawname}*.nc")
+        paths_to_read = sorted(path_with_files.glob(pattern_to_expand))
+        logger.info(f"{path_with_files}/{pattern_to_expand}")
         dataset = xarray.open_mfdataset(
             paths_to_read,
             concat_dim="time",

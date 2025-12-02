@@ -21,9 +21,9 @@ members_eerie_future = [
     "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025",
     "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.highres-future-ssp245.v20250425.atmos.gr025.daily",
-    "HadGEM3-GC5-EERIE-N216-ORCA025.highres-future-ssp245.v20250425.atmos.gr025.daily",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.highres-future-ssp245.v20250425.atmos.gr025.daily",
+    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.atmos.gr025.daily",
+    "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.atmos.gr025.daily",
+    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.atmos.gr025.daily",
 ]
 
 members_eerie_control_cmor = [
@@ -48,9 +48,9 @@ members_eerie_future_cmor = [
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.gr025.Amon",
     "icon-esm-er.highres-future-ssp245.v20240618.gr025.Amon",
     "ifs-nemo-er.highres-future-ssp245.v20250516.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.highres-future-ssp245.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N216-ORCA025.highres-future-ssp245.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.highres-future-ssp245.v20250425.gr025.Amon",
+    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon",
+    "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.gr025.Amon",
+    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.gr025.Amon",
 ]
 futuremember2hist = {
     hist: future for hist, future in zip(members_eerie_hist, members_eerie_future)
