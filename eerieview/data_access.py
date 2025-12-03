@@ -83,6 +83,13 @@ def get_entry_dataset(
     if "lon" not in dataset.dims and "native" not in member_str:
         dataset = dataset.set_index(value=("lat", "lon")).unstack("value")
     logger.info(dataset)
+    if "time_2" in dataset.coords:
+        logger.warning("Renaming time_2 to time")
+        if "time" in dataset.dims:
+            logger.info("Removing time")
+            dataset = dataset.drop_dims("time")
+        logger.info(dataset)
+        dataset = dataset.rename(time_2="time")
     time_index = dataset.time.to_index()
     logger.info(
         f"Time span for {member_str} is from {time_index[0]} to {time_index[-1]}."
