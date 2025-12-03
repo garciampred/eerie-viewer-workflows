@@ -384,7 +384,7 @@ def retry_get_entry_with_fixes(
             if rawname == "toscon":
                 member = copy.replace(member, version="v20251126")
             elif rawname == "zos":
-                member = copy.replace(member, version="v20250425")
+                member = copy.replace(member, version="v20251126")
             else:
                 pass
             pattern_to_expand = f"{rawname}_*.nc"
@@ -413,6 +413,7 @@ def retry_get_entry_with_fixes(
         "time_bnds",
         "lat_bnds",
         "lon_bnds",
+        "height"
     ]
     dataset = dataset.drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname

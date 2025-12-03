@@ -87,7 +87,7 @@ def main():
     all_members = (
         members_eerie_future_cmor + members_eerie_hist_cmor + members_eerie_control_cmor
     )
-    all_members = ["ifs-nemo-er.highres-future-ssp245.v20250516.gr025.Amon"]
+    all_members = ["HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon"]
     for member_str in all_members:
         logger.info(f"Computing monthly EKE for {member_str}")
         try:
