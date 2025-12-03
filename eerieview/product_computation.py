@@ -158,7 +158,7 @@ def get_model_decadal_product(
         # Get the raw variable name from the CMOR mapping
         if isinstance(member_obj, CmorEerieMember):
             rawname = varname
-            if varname in ["tasmax", "tasmin"] and "icon" in member_obj.model:
+            if varname in ["tasmax", "tasmin"] and member_obj.model in ['icon-esm-er', 'ifs-fesom2-sr']:
                 member_obj = member_obj.to_daily()
         else:
             rawname = get_raw_variable_name(member_str, varname)
@@ -276,6 +276,7 @@ def get_member_dataset(
         dataset, member, rawname = retry_get_entry_with_fixes(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
+    logger.info(dataset)
     # Handle realization dimension if present by averaging
     if "realization" in dataset:
         logger.info("Realization dimension detected. Averaging the ensemble members.")
