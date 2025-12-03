@@ -158,6 +158,8 @@ def get_model_decadal_product(
         # Get the raw variable name from the CMOR mapping
         if isinstance(member_obj, CmorEerieMember):
             rawname = varname
+            if varname in ["tasmax", "tasmin"] and "icon" in member_obj.model:
+                member_obj = member_obj.to_daily()
         else:
             rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(
@@ -373,7 +375,7 @@ def get_model_time_series(
         if isinstance(member_obj, CmorEerieMember):
             rawname = varname
             if varname in ["tasmax", "tasmin"] and "icon" in member_obj.model:
-                member_obj = copy.replace(member_obj, cmor_table="day")
+                member_obj = member_obj.to_daily()
         else:
             rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(

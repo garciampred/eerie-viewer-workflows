@@ -374,8 +374,6 @@ def retry_get_entry_with_fixes(
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
-        elif member.model == "icon-esm-er" and varname in ["tasmax", "tasmin"]:
-            member = member.to_daily()
         elif "hadgem3" in member.model.lower():
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
             grid = "gr1"
@@ -413,7 +411,7 @@ def retry_get_entry_with_fixes(
         "time_bnds",
         "lat_bnds",
         "lon_bnds",
-        "height"
+        "height",
     ]
     dataset = dataset.drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname
