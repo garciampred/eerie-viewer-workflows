@@ -353,7 +353,7 @@ def retry_get_entry_with_fixes(
     varname: str,
 ) -> tuple[xarray.Dataset, Member, str]:
     """Attempt to retrieve a dataset with common fixes if the initial attempt fails."""
-    if isinstance(member, EERIEMember):
+    if isinstance(member, EERIEMember) and member.simulation:
         member_str = member.to_string()
         member_str = member_str.replace("monthly", "daily")
         # Specific fixes for tasmax/tasmin with fesom
@@ -372,6 +372,10 @@ def retry_get_entry_with_fixes(
         # Read from files
         if member.model == "ifs-nemo-er":
             basedir = Path("/work/bm1344/DKRZ/CMOR/EERIE/HighResMIP/BSC/IFS-NEMO-ER")
+            grid = "gr"
+            pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
+        elif member.model == "ifs-fesom2":
+            basedir = Path(f"/work/kd0956/EERIE_CMOR/EERIE/EERIE/AWI/IFS-FESOM2-SR/{member.simulation}/r1i1p1f1/")
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():

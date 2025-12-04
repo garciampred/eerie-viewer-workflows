@@ -9,7 +9,7 @@ channels:
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW AS SHOWN IN THE EXAMPLE
 dependencies:
 - python=3.13
-- zarr
+- zarr<3
 - intake
 - intake-esm
 - intake-xarray
@@ -29,6 +29,7 @@ dependencies:
 - fastparquet
 - python-dotenv
 - xarray-regrid
+- numcodecs <0.16
 - pip:
   - gribscan==0.0.13
   - numba-stats
