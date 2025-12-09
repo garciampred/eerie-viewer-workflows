@@ -22,6 +22,10 @@ member2shortmeber = {
     "ifs-fesom2-sr-eerie-control-1950": "ifs-fesom2",
     "ifs-fesom2-sr-hist-1950": "ifs-fesom2",
     "icon-esm-er-hist-1950": "icon",
+    "ifs-nemo-er-hist-1950": "ifs-nemo-er",
+    "HadGEM3-GC5-EERIE-N216-ORCA025-eerie-historical": "hadgem3-mediumres",
+    "HadGEM3-GC5-EERIE-N640-ORCA12-eerie-historical": "hadgem3-hires",
+    "HadGEM3-GC5-EERIE-N96-ORCA1-eerie-historical": "hadgem3-lowres",
     "ifs-amip-tco1279-hist": "ifs-amip-tco1279-hist",
     "ifs-amip-tco1279-hist-c-0-a-lr20": "ifs-amip-tco1279-hist-c-0-a-lr20",
     "ifs-amip-tco399-hist-c-0-a-lr20": "ifs-amip-tco399-hist-c-0-a-lr20",
@@ -29,13 +33,28 @@ member2shortmeber = {
     "ifs-amip-tco399-hist": "ifs-amip-tco399-hist",
     "icon-esm-er-highres-future-ssp245": "icon",
     "ifs-fesom2-sr-highres-future-ssp245": "ifs-fesom2",
+    "ifs-nemo-er-highres-future-ssp245": "ifs-nemo-er",
+    "HadGEM3-GC5-EERIE-N216-ORCA025-eerie-ssp245": "hadgem3-mediumres",
+    "HadGEM3-GC5-EERIE-N640-ORCA12-eerie-ssp245": "hadgem3-hires",
+    "HadGEM3-GC5-EERIE-N96-ORCA1-eerie-ssp245": "hadgem3-lowres",
 }
 
 
 def get_merged_dataset(ifiles, chunks, drop_member: bool = False):
     to_merge = [
         xarray.open_dataset(f)
-        .drop_vars(["height2m", "height10m", "height_2", "lev"], errors="ignore")
+        .drop_vars(
+            [
+                "height2m",
+                "height10m",
+                "height_2",
+                "lev",
+                "latitude_longitude",
+                "lon_bnds",
+                "lat_bnds",
+            ],
+            errors="ignore",
+        )
         .chunk(chunks)
         for f in ifiles
     ]
@@ -71,7 +90,7 @@ def upload_eerie_climatologies(
 ):
     idir = Path(os.environ["PRODUCTSDIR"], "decadal")
     bucket = os.environ["S3_BUCKET"]
-    zarr_url = f"s3://{bucket}/decadal/{experiment}_EERIE_{product}.zarr"
+    zarr_url = f"s3://{bucket}/test/decadal/{experiment}_EERIE_{product}.zarr"
     ifiles = [
         f"{idir}/{varname}_{experiment}_EERIE_{product}.nc" for varname in variables
     ]
@@ -272,10 +291,10 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
 def upload_time_series(
     variables: list[str], variables_amip: list[str], region_set: str
 ):
-    upload_obs_time_series(variables, region_set)
-    upload_eerie_time_series(variables, "hist", region_set)
-    upload_eerie_time_series(variables_amip, "hist-amip", region_set)
-    upload_eerie_time_series(variables, "control", region_set)
+    # upload_obs_time_series(variables, region_set)
+    # upload_eerie_time_series(variables, "hist", region_set)
+    # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
+    # upload_eerie_time_series(variables, "control", region_set)
     upload_eerie_time_series(variables, "future", region_set)
 
 
@@ -291,20 +310,20 @@ def main():
         "tasmax",
         "tasmin",
         "zos",
-        "eke",
+        # "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke", "so"]]
-    for product in ["clim", "trend"]:
-        upload_obs_climatologies(variables, product=product)
-        for experiment in ["future", "hist", "control"]:  # , "hist-amip"]:
-            if experiment == "hist-amip":
-                variables_exp = variables_amip
-            else:
-                variables_exp = variables
-            logger.info(f"Uploading {product=} for {experiment=}")
-            upload_eerie_climatologies(
-                variables_exp, product=product, experiment=experiment, grid="025"
-            )
+    # for product in ["clim", "trend"]:
+    #     upload_obs_climatologies(variables, product=product)
+    #     for experiment in ["future", ]: #"hist", ]: #"control"]:  # , "hist-amip"]:
+    #         if experiment == "hist-amip":
+    #             variables_exp = variables_amip
+    #         else:
+    #             variables_exp = variables
+    #         logger.info(f"Uploading {product=} for {experiment=}")
+    #         upload_eerie_climatologies(
+    #             variables_exp, product=product, experiment=experiment, grid="025"
+    #         )
     upload_time_series(variables, variables_amip, "IPCC")
     upload_time_series(variables, variables_amip, "EDDY")
 
