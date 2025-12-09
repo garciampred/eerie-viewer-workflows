@@ -35,7 +35,7 @@ def compute_eke_for_member(
     varname = "zos"
     output_dir = os.environ["DIAGSDIR"]
     # Input data must be daily and ocean
-    member = member.to_daily().to_ocean()
+    member = member.to_ocean().to_daily()
     member_str = member.to_string()
     if "ifs-nemo" in member.model:
         member = copy.replace(member, cmor_table="HROday")
@@ -87,7 +87,7 @@ def main():
     all_members = (
         members_eerie_future_cmor + members_eerie_hist_cmor + members_eerie_control_cmor
     )
-    all_members = ["HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon"]
+    all_members = ["HadGEM3-GC5-EERIE-N640-ORCA12.eerie-piControl.v20230928.gr025.Amon"]
     for member_str in all_members:
         logger.info(f"Computing monthly EKE for {member_str}")
         try:

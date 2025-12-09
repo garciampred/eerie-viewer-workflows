@@ -27,7 +27,7 @@ members_eerie_future = [
 ]
 
 members_eerie_control_cmor = [
-    "ifs-nemo-er.eerie-control-1950.v20250516.gr025.Amon",
+    "ifs-nemo-er.control-1950.v20250516.gr025.Amon",
     "icon-esm-er.eerie-control-1950.v20240618.gr025.Amon",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.gr025.Amon",
     "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-picontrol.v20250425.gr025.Amon",
