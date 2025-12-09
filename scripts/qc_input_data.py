@@ -5,7 +5,6 @@ from eerieview.constants import OCEAN_VARIABLES, members_eerie_future_cmor
 from eerieview.data_access import get_diagnostic, get_entry_dataset, get_main_catalogue
 from eerieview.data_models import (
     CmorEerieMember,
-    DecadalProduct,
     EERIEMember,
     InputLocation,
     Member,
@@ -22,7 +21,6 @@ def check_variable_data(
     varname: str,
     location: InputLocation,
     members: list[str],
-    product: DecadalProduct = "clim",
     get_entry_dataset_fun=get_entry_dataset,
     member_class: type[Member] = EERIEMember,
 ):
@@ -59,7 +57,7 @@ def check_variable_data(
         dataset = dataset.squeeze()
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
         # Fix units if necessary (e.g., K to degC, m/s to mm/day)
-        dataset_cmor = fix_units(dataset_cmor, varname, product)
+        dataset_cmor = fix_units(dataset_cmor, varname)
         nan_mask = dataset_cmor.isnull().all(dim=("latitude", "longitude"))
         nan_times = dataset_cmor.time.to_index()[nan_mask]
         nan_records.append({member.slug: nan_times.tolist()})
@@ -68,7 +66,7 @@ def check_variable_data(
     print(df)
 
 
-def main(product: DecadalProduct):
+def main():
     location: InputLocation = "levante_cmor"
     members = members_eerie_future_cmor
 
@@ -83,7 +81,6 @@ def main(product: DecadalProduct):
             varname=varname,
             location=location,
             members=members,
-            product=product,
             get_entry_dataset_fun=get_entry_dataset_fun,
             member_class=CmorEerieMember,
         )

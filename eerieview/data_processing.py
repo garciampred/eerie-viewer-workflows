@@ -13,7 +13,6 @@ from eerieview.constants import OCEAN_VARIABLES
 from eerieview.data_models import (
     CmorEerieMember,
     EERIEMember,
-    EERIEProduct,
     InputLocation,
     Member,
     PeriodsConfig,
@@ -375,7 +374,9 @@ def retry_get_entry_with_fixes(
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif member.model == "ifs-fesom2":
-            basedir = Path(f"/work/kd0956/EERIE_CMOR/EERIE/EERIE/AWI/IFS-FESOM2-SR/{member.simulation}/r1i1p1f1/")
+            basedir = Path(
+                f"/work/kd0956/EERIE_CMOR/EERIE/EERIE/AWI/IFS-FESOM2-SR/{member.simulation}/r1i1p1f1/"
+            )
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():
@@ -415,7 +416,7 @@ def retry_get_entry_with_fixes(
         "lat_bnds",
         "lon_bnds",
         "height",
-        "time_bounds"
+        "time_bounds",
     ]
     dataset = dataset.drop_vars(vars_to_drop, errors="ignore")
     return dataset, member, rawname
@@ -483,9 +484,7 @@ def add_anomalies(
     return final_dataset
 
 
-def fix_units(
-    dataset: xarray.Dataset, varname: str, product: EERIEProduct
-) -> xarray.Dataset:
+def fix_units(dataset: xarray.Dataset, varname: str) -> xarray.Dataset:
     """Fix units of certain variables to a common standard (e.g., K to degC, m/s to mm/day)."""
     if varname == "pr":
         units = dataset[varname].attrs.get("units", "")
@@ -501,10 +500,7 @@ def fix_units(
         varname in ["tasmax", "tasmin", "tas", "tos"]
         and dataset[varname].isel(time=5).max().compute().item() > 200
     ):
-        if (
-            product != "trend"
-        ):  # Trends in K are the same as in degC, no conversion needed
-            dataset[varname] = dataset[varname] - 273.15
+        dataset[varname] = dataset[varname] - 273.15
         dataset[varname].attrs["units"] = "degC"
     return dataset
 
