@@ -4,9 +4,6 @@ location2prefix = dict(
 members_eerie_control = [
     "icon-esm-er.eerie-control-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.atmos.gr025.2D_monthly_avg",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-piControl.v20250425.atmos.gr025.daily",
-    "HadGEM3-GC5-EERIE-N216-ORCA025-orca12.eerie-piControl.v20250425.atmos.gr025.daily",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-piControl.v20250425.atmos.gr025.daily",
 ]
 members_eerie_hist = [
     "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
@@ -30,9 +27,6 @@ members_eerie_control_cmor = [
     "ifs-nemo-er.control-1950.v20250516.gr025.Amon",
     "icon-esm-er.eerie-control-1950.v20240618.gr025.Amon",
     "ifs-fesom2-sr.eerie-control-1950.v20240304.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-piControl.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-piControl.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-piControl.v20250425.gr025.Amon",
 ]
 
 members_eerie_hist_cmor = [

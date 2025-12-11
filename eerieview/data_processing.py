@@ -502,7 +502,7 @@ def fix_units(dataset: xarray.Dataset, varname: str) -> xarray.Dataset:
     ):
         dataset[varname] = dataset[varname] - 273.15
         dataset[varname].attrs["units"] = "degC"
-    if varname == "clt" and dataset[varname].isel(time=5).max().compute().item() > 1:
+    if varname == "clt" and (dataset[varname].attrs.get("units") == "%"):
         dataset[varname] = dataset[varname] * 0.01
         dataset[varname].attrs["units"] = "1"
     return dataset

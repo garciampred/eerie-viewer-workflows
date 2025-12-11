@@ -174,7 +174,7 @@ def get_model_decadal_product(
         dataset = dataset.squeeze()
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
         # Fix units if necessary (e.g., K to degC, m/s to mm/day)
-        dataset_cmor = fix_units(dataset_cmor, varname, product)
+        dataset_cmor = fix_units(dataset_cmor, varname)
 
         # Get the standardized member slug for dimension naming
         final_member = member.slug
@@ -239,6 +239,10 @@ def get_complete_input_dataset(
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
+        if "nemo" in member.model.lower() and rawname == "pr" and dataset_future[rawname].attrs["units"] == "kg m-2 s-1":
+            dataset_future["pr"] *= 3600 * 24
+            dataset_future["pr"].attrs["units"] = "mm"
+            
         if "hadgem" in member.model.lower():
             member_hist = copy.replace(member, simulation="eerie-historical")
         else:
@@ -404,7 +408,7 @@ def get_model_time_series(
             )
             # Fix units if necessary (e.g., temperature from K to degC).
             # 'product="series"' indicates that it's a time series for unit conversion logic.
-            dataset_ts = fix_units(dataset_ts, varname, product="series")
+            dataset_ts = fix_units(dataset_ts, varname)
             # Define and add extra dimensions (member, time_filter, period as 'reference').
             # The period is set to 'reference' as this is a continuous time series.
             dataset_ts = define_extra_dimensions(
