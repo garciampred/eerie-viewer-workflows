@@ -331,6 +331,7 @@ def aggregate_regions(
     set2filename = {
         "EDDY": "Eddy-rich-regions.geojson",
         "IPCC": "IPCC-WGI-reference-regions-v4_areas.geojson",
+        "Global": "global_region.geojson",
     }
     regions_file = Path(
         str(importlib.resources.files("eerieview")),

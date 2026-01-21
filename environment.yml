@@ -15,7 +15,7 @@ dependencies:
 - intake-xarray
 - python-eccodes=1.7.1
 - eccodes=2.36.0
-- xarray<2025.03
+- xarray
 - aiohttp
 - scipy
 - cfgrib
@@ -30,6 +30,7 @@ dependencies:
 - python-dotenv
 - xarray-regrid
 - numcodecs <0.16
+- blosc
 - pip:
   - gribscan==0.0.13
   - numba-stats

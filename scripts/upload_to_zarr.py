@@ -190,7 +190,8 @@ def upload_obs_time_series(variables: list[str], region_set: str):
     encoding = get_encoding(variables, "series", chunks)
     fs = get_filesystem()
     # Create an S3 store
-    store = zarr.storage.FSStore(zarr_url, fs=fs)
+    # store = zarr.storage.FSStore(zarr_url, fs=fs)
+    store = fs.get_mapper(zarr_url)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -291,11 +292,11 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
 def upload_time_series(
     variables: list[str], variables_amip: list[str], region_set: str
 ):
-    # upload_obs_time_series(variables, region_set)
+    upload_obs_time_series(variables, region_set)
     # upload_eerie_time_series(variables, "hist", region_set)
     # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
     # upload_eerie_time_series(variables, "control", region_set)
-    upload_eerie_time_series(variables, "future", region_set)
+    # upload_eerie_time_series(variables, "future", region_set)
 
 
 def main():

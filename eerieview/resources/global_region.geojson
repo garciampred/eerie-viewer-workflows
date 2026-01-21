@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "id": 1, "Name": "Global" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-180, -90],
+          [180, -90],
+          [180, 90],
+          [-180, 90],
+          [-180, -90]
+        ]]
+      }
+    }
+  ]
+}
