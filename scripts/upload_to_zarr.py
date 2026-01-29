@@ -60,22 +60,16 @@ def get_merged_dataset(ifiles, chunks, drop_member: bool = False):
     ]
     if drop_member:
         to_merge = [ds.drop_vars("member") for ds in to_merge]
-    dataset = xarray.merge(to_merge)
+    dataset = xarray.merge(to_merge, join="outer")
     return dataset
 
 
-def get_encoding(variables, product, chunks):
+def get_encoding(ds: xarray.Dataset, chunks: dict[str, int]):
     encoding = {}
-    encoding_var = dict(dtype="float32", chunks=tuple(chunks.values()))
-    for v in variables:
-        encoding[v] = encoding_var
-        if product in ["clim", "series"]:
-            encoding[v + "_anom"] = encoding_var
-        elif product == "trend":
-            encoding[v + "_pvalue"] = encoding_var
-        else:
-            raise RuntimeError(f"Unknown product {product}")
-
+    for v in ds.data_vars:
+        # Match chunks to dimension order of the variable
+        var_chunks = tuple(chunks.get(d, -1) for d in ds[v].dims)
+        encoding[v] = dict(dtype="float32", chunks=var_chunks)
     return encoding
 
 
@@ -105,10 +99,13 @@ def upload_eerie_climatologies(
     dataset = get_merged_dataset(ifiles, chunks)
     dataset = set_cmor_metadata(dataset, product)
     dataset = shorten_members(dataset)
-    encoding = get_encoding(variables, product, chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         logger.info(f"Saving {dataset} to {zarr_url}")
         dataset.to_zarr(
@@ -138,10 +135,13 @@ def upload_obs_climatologies(variables: list[str], product="clim"):
     dataset = get_merged_dataset(ifiles, chunks)
     dataset = dataset.drop_vars(["height2m", "height10m", "height_2"], errors="ignore")
     dataset = set_cmor_metadata(dataset, product)
-    encoding = get_encoding(variables, product, chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -163,10 +163,13 @@ def upload_eerie_time_series(variables: list[str], experiment: str, region_set: 
     dataset = set_cmor_metadata(dataset, "ts")
     if experiment != "hist-amip":
         dataset = shorten_members(dataset)
-    encoding = get_encoding(variables, "series", chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -187,11 +190,14 @@ def upload_obs_time_series(variables: list[str], region_set: str):
     dataset = get_merged_dataset(ifiles, chunks, drop_member=True)
     dataset = dataset.drop_vars(["height2m", "height10m"], errors="ignore")
     dataset = set_cmor_metadata(dataset, "ts")
-    encoding = get_encoding(variables, "series", chunks)
+    dataset = dataset.chunk(chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
-    # store = zarr.storage.FSStore(zarr_url, fs=fs)
-    store = fs.get_mapper(zarr_url)
+    store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -213,10 +219,13 @@ def upload_eddy_rich_zarr():
     dataset = dataset.drop_vars(["depth", "time"], errors="ignore")
     dataset = set_cmor_metadata(dataset, "clim")
     chunks = dict(lat=-1, lon=-1)
-    encoding = get_encoding(variables, "misc", chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -237,10 +246,13 @@ def upload_eddy_rich_zarr_5lev():
     dataset = dataset.drop_vars(["time"], errors="ignore")
     dataset = set_cmor_metadata(dataset, "clim")
     chunks = dict(depth=1, lat=-1, lon=-1)
-    encoding = get_encoding(variables, "misc", chunks)
+    encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    if fs.exists(zarr_url):
+        logger.info(f"Clearing existing store {zarr_url}")
+        fs.rm(zarr_url, recursive=True)
     with ProgressBar():
         dataset.to_zarr(
             store=store, zarr_format=2, consolidated=True, encoding=encoding, mode="w"
@@ -294,7 +306,7 @@ def upload_time_series(
 ):
     upload_obs_time_series(variables, region_set)
     # upload_eerie_time_series(variables, "hist", region_set)
-    # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
+    upload_eerie_time_series(variables_amip, "hist-amip", region_set)
     # upload_eerie_time_series(variables, "control", region_set)
     # upload_eerie_time_series(variables, "future", region_set)
 
