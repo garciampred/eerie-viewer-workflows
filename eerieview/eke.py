@@ -48,13 +48,14 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
     """
     if not da_clim_file.exists():
         # 21-year moving average for each dayofyear (assuming 'time' is daily data)
-        # min periods 10 ensures no data is filled with nan in the borders, even if the
-        # samples are smaller.
+        # We must ensure that each block has the full time series for the rolling mean to work.
+        # Otherwise, map_blocks will return NaNs at the borders of time chunks.
+        da_full_time = da.chunk(dict(time=-1))
         da_dayofyear_rolling_clim = xarray.map_blocks(
-            rolling_smooth_annual_cycly, da, template=da
-        ).to_dataset()
+            rolling_smooth_annual_cycly, da_full_time, template=da_full_time
+        )
         safe_to_netcdf(
-            da_dayofyear_rolling_clim,
+            da_dayofyear_rolling_clim.to_dataset(),
             da_clim_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
@@ -63,7 +64,7 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
         logger.info(f"Reading {da_clim_file}")
         da_dayofyear_rolling_clim = xarray.open_dataset(
             da_clim_file, chunks=dict(time=-1)
-        ).to_datarray()
+        ).zos
 
     # Remove Rolling daily Climatology from Signal
     da_detrend = da - da_dayofyear_rolling_clim
@@ -132,12 +133,11 @@ def compute_monthly_eke(
             zos_daily_climatology_file,
         )
         safe_to_netcdf(
-            zos_daily_anom,
+            zos_daily_anom.to_dataset(),
             daily_anom_zos_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
         )
-        zos_daily_anom = zos_daily_anom.zos
     else:
         zos_daily_anom = xarray.open_dataset(
             daily_anom_zos_file, chunks=dict(time=10, lon=-1, lat=-1)
