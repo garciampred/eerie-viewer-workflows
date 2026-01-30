@@ -50,7 +50,8 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
         # 21-year moving average for each dayofyear (assuming 'time' is daily data)
         # We must ensure that each block has the full time series for the rolling mean to work.
         # Otherwise, map_blocks will return NaNs at the borders of time chunks.
-        da_full_time = da.chunk(dict(time=-1))
+        # We also use smaller spatial blocks here to avoid OOM, as time=-1 can be very large.
+        da_full_time = da.chunk(dict(time=-1, lat=50, lon=50))
         da_dayofyear_rolling_clim = xarray.map_blocks(
             rolling_smooth_annual_cycly, da_full_time, template=da_full_time
         )
@@ -62,8 +63,10 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
         )
     else:
         logger.info(f"Reading {da_clim_file}")
+        # Use the same chunks as the input data to avoid expensive rechunking
+        # when calculating da - da_clim
         da_dayofyear_rolling_clim = xarray.open_dataset(
-            da_clim_file, chunks=dict(time=-1)
+            da_clim_file, chunks=dict(da.chunksizes)
         ).zos
 
     # Remove Rolling daily Climatology from Signal
