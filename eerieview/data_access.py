@@ -69,7 +69,7 @@ def get_entry_dataset(
     logger.info(f"Read EERIE member {member} to an xarray Dataset.")
     location_prefix = location2prefix[location]
     member_str = location_prefix + "." + member.to_string()
-    catalogue_entry = catalogue[member_str](method="kerchunk")  # type: ignore
+    catalogue_entry = catalogue[member_str](driver="kerchunk", chunks=dict(time=100, lon=100, lat=100))  # type: ignore
     dataset = to_dask_funct(catalogue_entry)
 
     if "control" in member_str and "fesom" not in member_str and isinstance(member, EERIEMember):

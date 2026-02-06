@@ -14,6 +14,34 @@
           [-180, -90]
         ]]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 2, "Name": "N-Hemisphere" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-180, 0],
+          [180, 0],
+          [180, 90],
+          [-180, 90],
+          [-180, 0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "id": 3, "Name": "S-Hemisphere" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-180, -90],
+          [180, -90],
+          [180, 0],
+          [-180, 0],
+          [-180, -90]
+        ]]
+      }
     }
   ]
 }

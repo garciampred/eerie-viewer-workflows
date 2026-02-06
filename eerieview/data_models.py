@@ -53,13 +53,18 @@ class EERIEMember(Member):
     npieces: ClassVar[int] = 6
 
     def to_ocean(self) -> "EERIEMember":
-        return copy.replace(self, realm="ocean")
+        new = copy.copy(self)
+        new.realm = "ocean"
+        return new 
 
     def to_atmos(self) -> "EERIEMember":
-        return copy.replace(self, realm="atmos")
+        new = copy.copy(self, realm="atmos")
+        new.realm = "atmos"
 
     def to_daily(self) -> "EERIEMember":
-        return copy.replace(self, freq="daily")
+        new = copy.replace(self)
+        new.freq = "daily"
+        return new
 
 
 @dataclass
@@ -69,17 +74,23 @@ class CmorEerieMember(Member):
     npieces: ClassVar[int] = 5
 
     def to_ocean(self) -> "CmorEerieMember":
-        return copy.replace(self, cmor_table=self.cmor_table.replace("A", "O"))
+        new = copy.copy(self)
+        new.cmor_table = self.cmor_table.replace("A", "O")
+        return new
 
     def to_atmos(self) -> "CmorEerieMember":
-        return copy.replace(self, cmor_table=self.cmor_table.replace("O", "A"))
+        new = copy.copy(self)
+        new.cmor_table = self.cmor_table.replace("O", "A")
+        return new
 
     def to_daily(self) -> "CmorEerieMember":
         if self.cmor_table == "Omon":
             new_table = "Oday"
         else:
             new_table = "day"
-        return copy.replace(self, cmor_table=new_table)
+        new =  copy.copy(self)
+        new.cmor_table = new_table
+        return new
 
 
 @dataclass

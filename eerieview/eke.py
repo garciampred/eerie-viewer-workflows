@@ -23,7 +23,8 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
     if da.isnull().all():
         return da
     decadal_window_size = 21  # years
-    smooth_window_len = 5  # days
+    smooth_window_len = 5  # daysa
+    print(da)
     # Rolling average for each day of year, with some years around
     da_rolling_clims = da.groupby("time.dayofyear").map(
         lambda x: x.rolling(
@@ -35,7 +36,7 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
     # Rolling average for each time with a few days around
     da_rolling_clims_smoothed = da_rolling_clims.rolling(
         time=smooth_window_len, min_periods=smooth_window_len // 2, center=True
-    ).mean()
+    ).mean().load()
     return da_rolling_clims_smoothed
 
 
@@ -52,21 +53,23 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
         # Otherwise, map_blocks will return NaNs at the borders of time chunks.
         # We also use smaller spatial blocks here to avoid OOM, as time=-1 can be very large.
         da_full_time = da.chunk(dict(time=-1, lat=50, lon=50))
+        print(da_full_time)
         da_dayofyear_rolling_clim = xarray.map_blocks(
             rolling_smooth_annual_cycly, da_full_time, template=da_full_time
         )
+        print(da_dayofyear_rolling_clim)
         safe_to_netcdf(
             da_dayofyear_rolling_clim.to_dataset(),
             da_clim_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
-        )
+         )
     else:
         logger.info(f"Reading {da_clim_file}")
         # Use the same chunks as the input data to avoid expensive rechunking
         # when calculating da - da_clim
         da_dayofyear_rolling_clim = xarray.open_dataset(
-            da_clim_file, chunks=dict(da.chunksizes)
+            da_clim_file, chunks=dict(time=1000, lon=100, lat=100)
         ).zos
 
     # Remove Rolling daily Climatology from Signal
@@ -135,6 +138,7 @@ def compute_monthly_eke(
             dataset.zos,
             zos_daily_climatology_file,
         )
+        print(zos_daily_anom)
         safe_to_netcdf(
             zos_daily_anom.to_dataset(),
             daily_anom_zos_file,
@@ -157,6 +161,5 @@ def compute_monthly_eke(
         .where(nan_mask)
         .transpose("time", "lat", "lon")
         .to_dataset(name="eke")
-        .chunk(dict(time=-1))
     )
     return eke_monthly
