@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
 import dask
 import xarray
+from dotenv import load_dotenv
 
 from eerieview.cmor import to_cmor_names
 from eerieview.constants import CMOR2C3SATLAS
@@ -16,6 +17,7 @@ from eerieview.io_utils import safe_to_netcdf
 from eerieview.logger import get_logger
 from eerieview.metadata import fix_attributes
 from eerieview.product_computation import get_time_series
+
 load_dotenv()
 # Initialize logger for the module.
 logger = get_logger(__name__)
@@ -168,17 +170,17 @@ def main():
         "vas",
     ]
     # Process each variable using ERA5 data.
-    for varname in variables_era5:
-        logger.info(f"Processing {varname} data from ERA5.")
-        get_obs_time_series(
-            varname,
-            obsdir,
-            output_dir,
-            "era5",  # Source is ERA5
-            region_set,
-            reference_period=reference_period_era5,
-            clobber=True,
-        )
+    # for varname in variables_era5:
+    #     logger.info(f"Processing {varname} data from ERA5.")
+    #     get_obs_time_series(
+    #         varname,
+    #         obsdir,
+    #         output_dir,
+    #         "era5",  # Source is ERA5
+    #         region_set,
+    #         reference_period=reference_period_era5,
+    #         clobber=True,
+    #     )
 
     # --- AVISO Data Processing ---
     # List of variables to process for AVISO.
@@ -193,7 +195,7 @@ def main():
             "aviso",  # Source is AVISO
             region_set,
             reference_period=reference_period_aviso,
-            clobber=True,  # Do not overwrite existing files for AVISO data.
+            clobber=True,
         )
 
 

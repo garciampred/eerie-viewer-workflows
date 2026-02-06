@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy
 import xarray
 
-from eerieview.io_utils import safe_to_netcdf
+from eerieview.io_utils import safe_to_zarr
 from eerieview.logger import get_logger
 
 logger = get_logger(__name__)
@@ -36,7 +36,8 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
     # Rolling average for each time with a few days around
     da_rolling_clims_smoothed = da_rolling_clims.rolling(
         time=smooth_window_len, min_periods=smooth_window_len // 2, center=True
-    ).mean().load()
+    ).mean()
+
     return da_rolling_clims_smoothed
 
 
@@ -58,17 +59,17 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
             rolling_smooth_annual_cycly, da_full_time, template=da_full_time
         )
         print(da_dayofyear_rolling_clim)
-        safe_to_netcdf(
+        safe_to_zarr(
             da_dayofyear_rolling_clim.to_dataset(),
             da_clim_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
-         )
+        )
     else:
         logger.info(f"Reading {da_clim_file}")
         # Use the same chunks as the input data to avoid expensive rechunking
         # when calculating da - da_clim
-        da_dayofyear_rolling_clim = xarray.open_dataset(
+        da_dayofyear_rolling_clim = xarray.open_zarr(
             da_clim_file, chunks=dict(time=1000, lon=100, lat=100)
         ).zos
 
@@ -139,14 +140,14 @@ def compute_monthly_eke(
             zos_daily_climatology_file,
         )
         print(zos_daily_anom)
-        safe_to_netcdf(
+        safe_to_zarr(
             zos_daily_anom.to_dataset(),
             daily_anom_zos_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
         )
     else:
-        zos_daily_anom = xarray.open_dataset(
+        zos_daily_anom = xarray.open_zarr(
             daily_anom_zos_file, chunks=dict(time=10, lon=-1, lat=-1)
         ).zos
     # Compute Geostrophic Velocities
