@@ -158,7 +158,10 @@ def get_model_decadal_product(
         # Get the raw variable name from the CMOR mapping
         if isinstance(member_obj, CmorEerieMember):
             rawname = varname
-            if varname in ["tasmax", "tasmin"] and member_obj.model in ['icon-esm-er', 'ifs-fesom2-sr']:
+            if varname in ["tasmax", "tasmin"] and member_obj.model in [
+                "icon-esm-er",
+                "ifs-fesom2-sr",
+            ]:
                 member_obj = member_obj.to_daily()
         else:
             rawname = get_raw_variable_name(member_str, varname)
@@ -239,10 +242,14 @@ def get_complete_input_dataset(
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        if "nemo" in member.model.lower() and rawname == "pr" and dataset_future[rawname].attrs["units"] == "kg m-2 s-1":
+        if (
+            "nemo" in member.model.lower()
+            and rawname == "pr"
+            and dataset_future[rawname].attrs["units"] == "kg m-2 s-1"
+        ):
             dataset_future["pr"] *= 3600 * 24
             dataset_future["pr"].attrs["units"] = "mm"
-            
+
         if "hadgem" in member.model.lower():
             member_hist = copy.replace(member, simulation="eerie-historical")
         else:

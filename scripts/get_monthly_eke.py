@@ -21,7 +21,6 @@ from eerieview.data_access import get_entry_dataset, get_main_catalogue
 from eerieview.data_models import CmorEerieMember, InputLocation, Member
 from eerieview.data_processing import retry_get_entry_with_fixes
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
-from eerieview.io_utils import safe_to_netcdf
 from eerieview.io_utils import safe_to_zarr
 from eerieview.logger import get_logger
 
@@ -103,7 +102,7 @@ def main():
         }
     )
     cluster = LocalCluster(n_workers=4, threads_per_worker=2, memory_limit="25GB")
-      # n_workers=1, memory_limit="40GB", threads_per_worker=4)
+    # n_workers=1, memory_limit="40GB", threads_per_worker=4)
     print(cluster)
     client = Client(cluster, timeout="120s")
     print("Dashboard URL:", client.dashboard_link)

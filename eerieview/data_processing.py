@@ -375,9 +375,7 @@ def retry_get_entry_with_fixes(
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif member.model == "ifs-fesom2-sr":
-            basedir = Path(
-                f"/work/kd0956/EERIE_CMOR/EERIE/EERIE/AWI/IFS-FESOM2-SR"
-            )
+            basedir = Path("/work/kd0956/EERIE_CMOR/EERIE/EERIE/AWI/IFS-FESOM2-SR")
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():
@@ -406,7 +404,7 @@ def retry_get_entry_with_fixes(
             combine="nested",
             coords="minimal",
             data_vars="minimal",
-            chunks=dict(time=1000, lat=100, lon=100)
+            chunks=dict(time=1000, lat=100, lon=100),
         )
     else:
         raise RuntimeError(f"Unknown member type {member}")

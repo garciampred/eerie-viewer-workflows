@@ -86,7 +86,9 @@ def get_exp_time_series(experiment: str, region_set: str):
 
 def main():
     region_sets = ["IPCC", "EDDY"]
-    experiments = ["hist", ]  # "control"]  # ["control", "hist", "hist-amip", "future"]
+    experiments = [
+        "hist",
+    ]  # "control"]  # ["control", "hist", "hist-amip", "future"]
     for region_set in region_sets:
         for exp in experiments:
             get_exp_time_series(exp, region_set)
