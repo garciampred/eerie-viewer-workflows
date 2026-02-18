@@ -16,7 +16,6 @@ class Member:
     model: str
     simulation: str
     version: str
-    grid: str
     npieces: ClassVar[int] = 4
 
     @classmethod
@@ -49,17 +48,19 @@ class Member:
 class EERIEMember(Member):
     # 'ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg'
     realm: str
+    grid: str
     freq: str
     npieces: ClassVar[int] = 6
 
     def to_ocean(self) -> "EERIEMember":
         new = copy.copy(self)
         new.realm = "ocean"
-        return new 
+        return new
 
     def to_atmos(self) -> "EERIEMember":
         new = copy.copy(self, realm="atmos")
         new.realm = "atmos"
+        return new
 
     def to_daily(self) -> "EERIEMember":
         new = copy.replace(self)
@@ -70,6 +71,7 @@ class EERIEMember(Member):
 @dataclass
 class CmorEerieMember(Member):
     # 'ifs-nemo-er.hist-1950.v20250516.gr025.Amon'
+    grid: str
     cmor_table: str
     npieces: ClassVar[int] = 5
 
@@ -88,7 +90,7 @@ class CmorEerieMember(Member):
             new_table = "Oday"
         else:
             new_table = "day"
-        new =  copy.copy(self)
+        new = copy.copy(self)
         new.cmor_table = new_table
         return new
 
