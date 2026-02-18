@@ -141,7 +141,7 @@ def compute_monthly_eke(
         )
         print(zos_daily_anom)
         safe_to_zarr(
-            zos_daily_anom.to_dataset(),
+            zos_daily_anom.to_dataset().chunk(dict(time=1000, lat=100, lon=100)),
             daily_anom_zos_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,

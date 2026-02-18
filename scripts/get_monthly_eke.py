@@ -22,6 +22,7 @@ from eerieview.data_models import CmorEerieMember, InputLocation, Member
 from eerieview.data_processing import retry_get_entry_with_fixes
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
+from eerieview.io_utils import safe_to_zarr
 from eerieview.logger import get_logger
 
 load_dotenv()
@@ -77,9 +78,9 @@ def compute_eke_for_member(
         eke_monthly = compute_monthly_eke(
             dataset_cmor, daily_anom_zos_file, zos_daily_climatology_file
         )
-        safe_to_netcdf(
+        safe_to_zarr(
             eke_monthly,
-            output_path,
+            Path(str(output_path).replace(".nc", ".zarr")),
             encoding=dict(eke=DEFAULT_ENCODING),
             show_progress=True,
         )
@@ -101,9 +102,8 @@ def main():
             "distributed.worker.memory.pause": 0.95,  # only pause as a last resort
         }
     )
-    cluster = LocalCluster(
-        n_workers=4, memory_limit="25GB"
-    )  # n_workers=1, memory_limit="40GB", threads_per_worker=4)
+    cluster = LocalCluster(n_workers=4, threads_per_worker=2, memory_limit="25GB")
+      # n_workers=1, memory_limit="40GB", threads_per_worker=4)
     print(cluster)
     client = Client(cluster, timeout="120s")
     print("Dashboard URL:", client.dashboard_link)
