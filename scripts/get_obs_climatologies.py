@@ -77,6 +77,7 @@ def get_obs_decadal_product(
     climatologies = []
     rawname = CMOR2C3SATLAS[varname]
     dataset = get_obs_dataset_fun(obsdir, rawname).rename({rawname: varname})
+    dataset = fix_units(dataset, varname, product)
 
     # Iterate through each defined time filter (e.g., annual, seasonal).
     for time_filter in time_filters:
@@ -105,7 +106,7 @@ def get_obs_decadal_product(
             )
 
             # Fix units of the variable if necessary (e.g., temperature from K to degC, precipitation units).
-            dataset_product = fix_units(dataset_product, varname, product)
+            
             climatologies.append(dataset_product)
 
     # Merge all individual product datasets into a single xarray Dataset.
