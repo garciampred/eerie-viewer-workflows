@@ -6,7 +6,7 @@ members_eerie_control = [
     "ifs-fesom2-sr.eerie-control-1950.v20240304.atmos.gr025.2D_monthly_avg",
 ]
 members_eerie_hist = [
-    "ifs-nemo-er.hist-1950.v20250516.atmos.gr025",
+    "ifs-nemo-er.hist-1950.v20250516.atmos.gr025.monthly",
     "ifs-fesom2-sr.hist-1950.v20240304.atmos.gr025.2D_monthly_avg",
     "icon-esm-er.hist-1950.v20240618.atmos.gr025.2d_monthly_mean",
     "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-historical.v20250425.atmos.gr025.daily",
@@ -15,7 +15,7 @@ members_eerie_hist = [
 ]
 
 members_eerie_future = [
-    "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025",
+    "ifs-nemo-er.highres-future-ssp245.v20250516.atmos.gr025.monthly",
     "icon-esm-er.highres-future-ssp245.v20240618.atmos.gr025.2d_monthly_mean",
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.atmos.gr025.2D_monthly_avg",
     "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.atmos.gr025.daily",
