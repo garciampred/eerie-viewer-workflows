@@ -58,7 +58,7 @@ class EERIEMember(Member):
         return new
 
     def to_atmos(self) -> "EERIEMember":
-        new = copy.copy(self, realm="atmos")
+        new = copy.copy(self)
         new.realm = "atmos"
         return new
 

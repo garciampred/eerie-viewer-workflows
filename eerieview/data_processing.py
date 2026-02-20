@@ -484,7 +484,7 @@ def add_anomalies(
     return final_dataset
 
 
-def fix_units(dataset: xarray.Dataset, varname: str) -> xarray.Dataset:
+def fix_units(dataset: xarray.Dataset, varname: str, product: str = None) -> xarray.Dataset:
     """Fix units of certain variables to a common standard (e.g., K to degC, m/s to mm/day)."""
     if varname == "pr":
         units = dataset[varname].attrs.get("units", "")
@@ -499,6 +499,7 @@ def fix_units(dataset: xarray.Dataset, varname: str) -> xarray.Dataset:
     if (
         varname in ["tasmax", "tasmin", "tas", "tos"]
         and dataset[varname].isel(time=5).max().compute().item() > 200
+        and product !="trend"
     ):
         dataset[varname] = dataset[varname] - 273.15
         dataset[varname].attrs["units"] = "degC"
