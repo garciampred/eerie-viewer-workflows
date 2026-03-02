@@ -162,5 +162,6 @@ def compute_monthly_eke(
         .where(nan_mask)
         .transpose("time", "lat", "lon")
         .to_dataset(name="eke")
+        .chunk({"time": 120, "lat": 180, "lon": 360})
     )
     return eke_monthly
