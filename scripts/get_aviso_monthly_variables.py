@@ -10,18 +10,12 @@ from dotenv import load_dotenv
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf
 
-from dask.distributed import Client, LocalCluster
 
 # Crear el cluster Dask ANTES de cargar datos
 
 load_dotenv()
 
 
-def main_eke():
-    cluster = LocalCluster(n_workers=8, threads_per_worker=2, memory_limit='10GB')
-    client = Client(cluster)
-    print(client.dashboard_link)
-    
     storage_dir = Path(os.environ["DOWNLOADIR"], "aviso")
 
     daily_anom_zos_file = Path(storage_dir, "zos_anom_aviso_daily.nc")
@@ -29,7 +23,7 @@ def main_eke():
 
     dataset = xarray.open_dataset(
         aviso_daily_zos_file,
-        chunks=dict(time=100, latitude=500, longitude=500),
+        chunks=dict(time=-1, latitude=100, longitude=100),
     ).rename(adt="zos", longitude="lon", latitude="lat")
 
     zos_daily_climatology_file = Path(storage_dir, "zos_clim_aviso_dayofyear.nc")

@@ -70,7 +70,7 @@ def remove_smooth_climatology(da: xarray.DataArray, da_clim_file: Path):
         # Use the same chunks as the input data to avoid expensive rechunking
         # when calculating da - da_clim
         da_dayofyear_rolling_clim = xarray.open_zarr(
-            da_clim_file, chunks=dict(time=1000, lon=100, lat=100)
+            da_clim_file, chunks=dict(time=-1, lon=50, lat=50)
         ).zos
 
     # Remove Rolling daily Climatology from Signal
@@ -141,7 +141,7 @@ def compute_monthly_eke(
         )
         print(zos_daily_anom)
         safe_to_zarr(
-            zos_daily_anom.to_dataset().chunk(dict(time=1000, lat=100, lon=100)),
+            zos_daily_anom.to_dataset().chunk(dict(time=30, lat=100, lon=100)),
             daily_anom_zos_file,
             encoding=dict(zos=DEFAULT_ENCODING),
             show_progress=True,
