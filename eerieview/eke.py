@@ -154,7 +154,7 @@ def compute_monthly_eke(
     u_g, v_g = compute_geostrophic_velocities(zos_daily_anom, latlon_units="degrees")
     eke = 0.5 * (u_g**2 + v_g**2)
     # Compute Full Time-Mean EKE
-    nan_mask = dataset.zos.isel(time=0).notnull().squeeze()
+    nan_mask = dataset.zos.isel(time=0).notnull().squeeze().compute()
     nan_mask.loc[dict(lat=slice(-3, 3))] = 0
     eke_monthly = (
         eke.resample(time="MS")
