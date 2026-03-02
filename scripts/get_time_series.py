@@ -46,6 +46,7 @@ def get_exp_time_series(experiment: str, region_set: str):
   #      "tas",
   #      "pr",
         "tos",
+        "sos",
   #      "clt",
   #      "zos",
   #      "tasmax",
@@ -56,7 +57,7 @@ def get_exp_time_series(experiment: str, region_set: str):
     # Iterate through each variable to process.
     for varname in variables_to_process:
         # Skip specific variables for the 'hist-amip' experiment if they are not relevant.
-        if experiment == "hist-amip" and varname in ["eke", "zos"]:
+        if experiment == "hist-amip" and varname in ["eke", "zos", "sos"]:
             logger.info(f"Skipping {varname} for {experiment} experiment.")
             continue
 

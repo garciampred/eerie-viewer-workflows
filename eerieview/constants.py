@@ -65,7 +65,7 @@ members_eerie_hist_amip = [
 
 missing_periods = ["1950-1969"]
 AVISO_VARIABLES = ["eke", "zos"]
-OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo", "so"]
+OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo", "so", "sos"]
 CMOR2EERIE = {
     "pr": "tprate",
     "tas": "mean2t",
