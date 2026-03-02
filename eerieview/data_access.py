@@ -120,6 +120,8 @@ def get_obs_dataset(obsdir: Path, rawname: str) -> xarray.Dataset:
     """
     if rawname in ["eke", "zos"]:
         ipath = Path(obsdir, f"{rawname}_AVISO_mon_199301-202206.nc")
+    elif rawname == "sos":
+        ipath = Path(obsdir, "sos_ORAS5_mon_195801-202212.nc")
     else:
         ipath = Path(obsdir, f"{rawname}_ERA5_mon_194001-202212.nc")
 
@@ -132,6 +134,8 @@ def get_obs_dataset(obsdir: Path, rawname: str) -> xarray.Dataset:
         )
     elif "valid_time" in dataset.dims:
         dataset = dataset.rename(dict(valid_time="time"))
+    elif "time_counter" in dataset.dims:
+        dataset = dataset.rename(dict(time_counter="time"))
 
     return dataset
 

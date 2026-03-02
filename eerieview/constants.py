@@ -73,6 +73,7 @@ CMOR2EERIE = {
     "tasmin": "mn2t",
     "clt": "meantcc",
     "tos": "avg_tos",
+    "sos":"sos",
     "zos": "avg_zos",
     "uas": "m10u",
     "vas": "m10v",
@@ -106,6 +107,7 @@ CMOR2C3SATLAS = {
     "vas": "v10",
     "zos": "zos",
     "eke": "eke",
+    "sos": "sos",
 }
 NUM2MONTH = {
     1: "Jan",
