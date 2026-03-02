@@ -4,18 +4,17 @@ import os
 from pathlib import Path
 
 import xarray
-from dask.diagnostics import ProgressBar
 from dotenv import load_dotenv
 
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
-from eerieview.io_utils import safe_to_netcdf
+from eerieview.io_utils import safe_to_netcdf, safe_to_zarr
 
 
 # Crear el cluster Dask ANTES de cargar datos
 
 load_dotenv()
 
-
+def main_eke():
     storage_dir = Path(os.environ["DOWNLOADIR"], "aviso")
 
     daily_anom_zos_file = Path(storage_dir, "zos_anom_aviso_daily.nc")
@@ -23,7 +22,7 @@ load_dotenv()
 
     dataset = xarray.open_dataset(
         aviso_daily_zos_file,
-        chunks=dict(time=-1, latitude=100, longitude=100),
+        chunks=dict(time=-1, latitude=500, longitude=500),
     ).rename(adt="zos", longitude="lon", latitude="lat")
 
     zos_daily_climatology_file = Path(storage_dir, "zos_clim_aviso_dayofyear.nc")
@@ -37,10 +36,9 @@ load_dotenv()
     timeindex = eke_monthly.time.to_index()
     mintime = f"{timeindex[0]:%Y%m}"
     maxtime = f"{timeindex[-1]:%Y%m}"
-    output_path = Path(storage_dir, f"eke_AVISO_mon_{mintime}-{maxtime}.nc")
+    output_path = Path(storage_dir, f"eke_AVISO_mon_{mintime}-{maxtime}.zarr")
 
-    with ProgressBar():
-        eke_monthly.to_netcdf(output_path, encoding=dict(eke=DEFAULT_ENCODING))
+    safe_to_zarr(eke_monthly, output_path, encoding=dict(eke=DEFAULT_ENCODING))
 
 
 def main_zos():
