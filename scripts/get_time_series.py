@@ -40,19 +40,19 @@ def get_exp_time_series(experiment: str, region_set: str):
 
     # Define the list of variables to process.
     variables_to_process = [
-        "sfcWind",
-        "uas",
-        "vas",
-        "tas",
-        "pr",
+  #      "sfcWind",
+  #      "uas",
+  #      "vas",
+  #      "tas",
+  #      "pr",
         "tos",
-        "clt",
-        "zos",
-        "tasmax",
-        "tasmin",
+  #      "clt",
+  #      "zos",
+  #      "tasmax",
+  #      "tasmin",
         #       "eke",
     ]
-
+    
     # Iterate through each variable to process.
     for varname in variables_to_process:
         # Skip specific variables for the 'hist-amip' experiment if they are not relevant.

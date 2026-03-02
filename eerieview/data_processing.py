@@ -4,6 +4,7 @@ from datetime import datetime
 from itertools import chain
 from pathlib import Path
 from typing import Callable, Union
+from dataclasses import replace
 
 import numpy
 import xarray
@@ -379,13 +380,30 @@ def retry_get_entry_with_fixes(
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():
+            hadgem_atmos2ocean =  {"HadGEM3-GC5E-LL": "hadgem3-gc5-n96-orca1",
+                                    "HadGEM3-GC5E-HH": "hadgem3-gc5-n640-orca12",}
+
+            hadgem_sim2ocean = {"historical": "eerie-historical",
+                                "ssp245": "eerie-ssp245",}
+
+            if member.model in hadgem_atmos2ocean and varname in ["tos", "zos"]:
+                ocean_model = hadgem_atmos2ocean[member.model]
+                ocean_sim = hadgem_sim2ocean[member.simulation]
+                cmor_table = "Omon" if varname == "tos" else "Oday"
+                rawname = "toscon" if varname == "tos" else "zos"
+                catalog_entry = catalogue[f"dkrz.disk.model-output.{ocean_model}.{ocean_sim}.ocean.gr1.{cmor_table}"]()
+                dataset = catalog_entry.to_dask()[[rawname]]
+                #ocean_member = replace(member, model=ocean_model, simulation=ocean_sim, cmor_table=cmor_table, grid="gr1")
+                #dataset = get_entry_dataset_fun(catalogue, ocean_member, rawname, location="levante")
+                return dataset, member, rawname
+            
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
             grid = "gr1"
             if rawname == "tos":
                 rawname = "toscon"
-                member = copy.replace(member, version="v20251126")
+                member = replace(member, version="v20251126")
             elif rawname == "zos":
-                member = copy.replace(member, version="v20251126")
+                member = replace(member, version="v20251126")
             else:
                 pass
             pattern_to_expand = f"{rawname}_*.nc"
@@ -517,12 +535,12 @@ def rename_realm(member: Member, varname: str) -> Member:
         and "amip" != member.simulation
         and not isinstance(member, CmorEerieMember)
     ):
-        member = copy.replace(member, realm="ocean")
+        member = replace(member, realm="ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
         if "ifs-fesom2-sr" == member.model and (
             "hist" in member.simulation or "control" in member.simulation
         ):
-            member = copy.replace(member, freq="daily_1950-2014")
+            member = replace(member, freq="daily_1950-2014")
     # Adjust member string for ICON tasmax/tasmin variables
     if (
         "icon" in member.model
@@ -530,5 +548,5 @@ def rename_realm(member: Member, varname: str) -> Member:
         and not isinstance(member, CmorEerieMember)
     ):
         extreme = "max" if varname == "tasmax" else "min"
-        member = copy.replace(member, freq=f"daily_{extreme}")
+        member = replace(member, freq=f"daily_{extreme}")
     return member

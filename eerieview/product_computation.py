@@ -3,6 +3,7 @@ from datetime import datetime
 from functools import reduce
 from pathlib import Path
 from typing import Callable
+from dataclasses import replace
 
 import dask
 import intake
@@ -251,9 +252,9 @@ def get_complete_input_dataset(
             dataset_future["pr"].attrs["units"] = "mm"
 
         if "hadgem" in member.model.lower():
-            member_hist = copy.replace(member, simulation="eerie-historical")
+            member_hist = replace(member, simulation="eerie-historical")
         else:
-            member_hist = copy.replace(member, simulation="hist-1950")
+            member_hist = replace(member, simulation="hist-1950")
         member_hist = rename_realm(member_hist, varname)
         dataset_hist, _, rawname = get_member_dataset(
             catalogue,
@@ -473,6 +474,7 @@ def get_model_time_series(
 
     # Define encoding options for the NetCDF variables to optimize storage.
     # Chunking is specified for better I/O performance.
+    print(f"Final dataset dimensions: {final_dataset.dims}")
     encoding_variable = dict(
         dtype="float32",
         zlib=True,
