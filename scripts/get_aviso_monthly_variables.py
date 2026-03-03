@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 
+import dask
 import xarray
 from dotenv import load_dotenv
 
@@ -15,6 +16,7 @@ from eerieview.io_utils import safe_to_netcdf, safe_to_zarr
 load_dotenv()
 
 def main_eke():
+    dask.config.set(scheduler="synchronous")
     storage_dir = Path(os.environ["DOWNLOADIR"], "aviso")
 
     daily_anom_zos_file = Path(storage_dir, "zos_anom_aviso_daily.nc")
