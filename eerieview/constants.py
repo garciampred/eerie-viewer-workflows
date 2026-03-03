@@ -33,19 +33,24 @@ members_eerie_hist_cmor = [
     "ifs-fesom2-sr.hist-1950.v20240304.gr025.Amon",
     "icon-esm-er.hist-1950.v20240618.gr025.Amon",
     "ifs-nemo-er.hist-1950.v20250516.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-historical.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-historical.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-historical.v20250425.gr025.Amon",
+    #"HadGEM3-GC5E-LL.historical.v20250409.gr1.Amon",
+    #"HadGEM3-GC5E-HH.historical.v20250409.gr1.Amon",
+    #"HadGEM3-GC5-EERIE-N96-ORCA1.eerie-historical.v20250425.gr025.Amon",
+    #"HadGEM3-GC5-EERIE-N216-ORCA025.eerie-historical.v20250425.gr025.Amon",
+    #"HadGEM3-GC5-EERIE-N640-ORCA12.eerie-historical.v20250425.gr025.Amon",
 ]
 
 members_eerie_future_cmor = [
     "ifs-fesom2-sr.highres-future-ssp245.v20240304.gr025.Amon",
     "icon-esm-er.highres-future-ssp245.v20240618.gr025.Amon",
     "ifs-nemo-er.highres-future-ssp245.v20250516.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.gr025.Amon",
-    "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.gr025.Amon",
+    #"HadGEM3-GC5E-LL.historical.v20250409.gr1.Amon",
+    #"HadGEM3-GC5E-HH.historical.v20250409.gr1.Amon",
+    #"HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon",
+    #"HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.gr025.Amon",
+    #"HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.gr025.Amon",
 ]
+
 futuremember2hist = {
     hist: future for hist, future in zip(members_eerie_hist, members_eerie_future)
 }
@@ -60,7 +65,7 @@ members_eerie_hist_amip = [
 
 missing_periods = ["1950-1969"]
 AVISO_VARIABLES = ["eke", "zos"]
-OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo", "so"]
+OCEAN_VARIABLES = ["tos", "sic", "zos", "uo", "vo", "so", "sos"]
 CMOR2EERIE = {
     "pr": "tprate",
     "tas": "mean2t",
@@ -68,6 +73,7 @@ CMOR2EERIE = {
     "tasmin": "mn2t",
     "clt": "meantcc",
     "tos": "avg_tos",
+    "sos":"sos",
     "zos": "avg_zos",
     "uas": "m10u",
     "vas": "m10v",
@@ -101,6 +107,7 @@ CMOR2C3SATLAS = {
     "vas": "v10",
     "zos": "zos",
     "eke": "eke",
+    "sos": "sos",
 }
 NUM2MONTH = {
     1: "Jan",
