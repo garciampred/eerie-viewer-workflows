@@ -188,6 +188,9 @@ def upload_obs_time_series(variables: list[str], region_set: str):
     logger.info(f"Reading {ifiles}")
     chunks = dict(time_filter=1, time=-1, region=1)
     dataset = get_merged_dataset(ifiles, chunks, drop_member=True)
+    # We need to add a member here, or the frontend breaks
+    dataset = dataset.expand_dims(dim=dict(member=["obs"]))
+    chunks = dict(member=1, time_filter=1, time=-1, region=1)
     dataset = dataset.drop_vars(["height2m", "height10m"], errors="ignore")
     dataset = set_cmor_metadata(dataset, "ts")
     dataset = dataset.chunk(chunks)
@@ -306,7 +309,7 @@ def upload_time_series(
 ):
     upload_obs_time_series(variables, region_set)
     # upload_eerie_time_series(variables, "hist", region_set)
-    upload_eerie_time_series(variables_amip, "hist-amip", region_set)
+    # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
     # upload_eerie_time_series(variables, "control", region_set)
     # upload_eerie_time_series(variables, "future", region_set)
 
@@ -323,7 +326,7 @@ def main():
         "tasmax",
         "tasmin",
         "zos",
-        # "eke",
+        "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke", "so"]]
     # for product in ["clim", "trend"]:
