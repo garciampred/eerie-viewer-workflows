@@ -33,6 +33,7 @@ VARIABLES = [
     "pr",
     "tos",
     "zos",
+    "sos",
     "clt",
     "tasmax",
     "tasmin",
@@ -144,7 +145,7 @@ def main_amip():
     periods = [(1991, 2020)]
     periods_config = PeriodsConfig(reference_period, periods)
     output_dir = Path(os.environ["PRODUCTSDIR"], "decadal")
-    variables_amip = [v for v in VARIABLES if v not in ["eke", "zos"]]
+    variables_amip = [v for v in VARIABLES if v not in ["eke", "zos", "sos"]]
     for varname in variables_amip:
         logger.info(f"Processing {varname} data for 'hist-amip' experiment")
         get_model_decadal_product(
@@ -160,7 +161,9 @@ def main_amip():
 
 
 if __name__ == "__main__":
-    # main_future("clim")
+    main_hist("clim")
+    main_hist("trend")
+    main_future("clim")
     main_future("trend")
     # main_control("clim")
     # main_control("trend")
