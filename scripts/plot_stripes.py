@@ -36,6 +36,7 @@ def main():
             continue
         if product == "ts":
             dataset["time"] = dataset.time.dt.year
+            print(dataset)
 
         for variable in eval(row.variables):
             plot_variable(dataset, dataset_name, product, row, variable)
@@ -45,13 +46,14 @@ def main():
 
 def plot_variable(dataset, dataset_name, product, row, variable):
     if product in ["clim", "trend"]:
-        agg_data = dataset[variable].mean(dim=("lat", "lon"))
+        return None
+        agg_data = dataset[variable].mean(dim=("lat", "lon")).squeeze()
         if dataset_name != "obs":
             table = agg_data.stack(period_filter=("period", "time_filter")).to_pandas()
         else:
             table = agg_data.to_pandas()
     elif product == "ts":
-        agg_data = dataset[variable].mean(dim="region")
+        agg_data = dataset[variable].mean(dim="region").squeeze(drop=True)
         if dataset_name != "obs":
             table = (
                 agg_data.stack(member_filter=("member", "time_filter")).to_pandas().T
