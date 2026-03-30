@@ -17,7 +17,7 @@ from eerieview.zarr import get_filesystem
 load_dotenv()
 logger = get_logger(__name__)
 
-member2shortmeber = {
+member2shortmember = {
     "icon-esm-er-eerie-control-1950": "icon",
     "ifs-fesom2-sr-eerie-control-1950": "ifs-fesom2",
     "ifs-fesom2-sr-hist-1950": "ifs-fesom2",
@@ -34,9 +34,10 @@ member2shortmeber = {
     "icon-esm-er-highres-future-ssp245": "icon",
     "ifs-fesom2-sr-highres-future-ssp245": "ifs-fesom2",
     "ifs-nemo-er-highres-future-ssp245": "ifs-nemo-er",
-    "HadGEM3-GC5-EERIE-N216-ORCA025-eerie-ssp245": "hadgem3-mediumres",
-    "HadGEM3-GC5-EERIE-N640-ORCA12-eerie-ssp245": "hadgem3-hires",
-    "HadGEM3-GC5-EERIE-N96-ORCA1-eerie-ssp245": "hadgem3-lowres",
+    "HadGEM3-GC5E-HH-historical": "hadgem3-hires",
+    "HadGEM3-GC5E-LL-historical": "hadgem3-lowres",
+    "HadGEM3-GC5E-LL-ssp245": "hadgem3-lowres",
+    "HadGEM3-GC5E-HH-ssp245": "hadgem3-hires",
 }
 
 
@@ -48,6 +49,7 @@ def get_merged_dataset(ifiles, chunks, drop_member: bool = False):
                 "height2m",
                 "height10m",
                 "height_2",
+                "height_3",
                 "lev",
                 "latitude_longitude",
                 "lon_bnds",
@@ -74,7 +76,10 @@ def get_encoding(ds: xarray.Dataset, chunks: dict[str, int]):
 
 
 def shorten_members(dataset):
-    dataset["member"] = dataset["member"].to_index().map(member2shortmeber)
+    logger.info(
+        f"Mapping members {dataset.member.to_index().tolist()} to short names with {member2shortmember}"
+    )
+    dataset["member"] = dataset["member"].to_index().map(member2shortmember)
     assert not dataset.member.isnull().any()
     return dataset
 
@@ -84,7 +89,7 @@ def upload_eerie_climatologies(
 ):
     idir = Path(os.environ["PRODUCTSDIR"], "decadal")
     bucket = os.environ["S3_BUCKET"]
-    zarr_url = f"s3://{bucket}/test/decadal/{experiment}_EERIE_{product}.zarr"
+    zarr_url = f"s3://{bucket}/decadal/{experiment}_EERIE_{product}.zarr"
     ifiles = [
         f"{idir}/{varname}_{experiment}_EERIE_{product}.nc" for varname in variables
     ]
@@ -103,6 +108,7 @@ def upload_eerie_climatologies(
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
+    logger.info(dataset.info())
     if fs.exists(zarr_url):
         logger.info(f"Clearing existing store {zarr_url}")
         fs.rm(zarr_url, recursive=True)
@@ -138,6 +144,7 @@ def upload_obs_climatologies(variables: list[str], product="clim"):
     encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
+    logger.info(dataset.info())
     store = zarr.storage.FSStore(zarr_url, fs=fs)
     if fs.exists(zarr_url):
         logger.info(f"Clearing existing store {zarr_url}")
@@ -157,13 +164,16 @@ def upload_eerie_time_series(variables: list[str], experiment: str, region_set: 
         f"{idir}/{varname}_{experiment}_EERIE_{region_set}_ts.nc"
         for varname in variables
     ]
-    chunks = dict(time_filter=1, time=-1, region=1)
+    chunks = dict(member=-1, time_filter=1, time=-1, region=1)
     dataset = get_merged_dataset(ifiles, chunks)
     dataset = dataset.drop_vars(["height2m", "height10m", "height_3"], errors="ignore")
     dataset = set_cmor_metadata(dataset, "ts")
+    dataset = dataset.chunk(chunks)
     if experiment != "hist-amip":
         dataset = shorten_members(dataset)
     encoding = get_encoding(dataset, chunks)
+    logger.info(dataset.tas)
+    logger.info(encoding)
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
@@ -289,7 +299,10 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
             attrval = attrs[attrname]
             if attrname == "units":
                 if varname_noanom in ["tas", "tasmin", "tasmax", "tos"]:
-                    attrval = "degC"
+                    if product == "trend":
+                        attrval = "degC"
+                    else:
+                        attrval = "degC decade-1"
                 if varname_noanom == "pr":
                     attrval = "mm day-1"
             if "anom" in str(varname):
@@ -308,10 +321,10 @@ def upload_time_series(
     variables: list[str], variables_amip: list[str], region_set: str
 ):
     upload_obs_time_series(variables, region_set)
-    # upload_eerie_time_series(variables, "hist", region_set)
+    upload_eerie_time_series(variables, "hist", region_set)
     # upload_eerie_time_series(variables_amip, "hist-amip", region_set)
-    # upload_eerie_time_series(variables, "control", region_set)
-    # upload_eerie_time_series(variables, "future", region_set)
+    upload_eerie_time_series(variables, "control", region_set)
+    upload_eerie_time_series(variables, "future", region_set)
 
 
 def main():
@@ -329,17 +342,17 @@ def main():
         "eke",
     ]
     variables_amip = [v for v in variables if v not in ["zos", "eke", "so"]]
-    # for product in ["clim", "trend"]:
-    #     upload_obs_climatologies(variables, product=product)
-    #     for experiment in ["future", ]: #"hist", ]: #"control"]:  # , "hist-amip"]:
-    #         if experiment == "hist-amip":
-    #             variables_exp = variables_amip
-    #         else:
-    #             variables_exp = variables
-    #         logger.info(f"Uploading {product=} for {experiment=}")
-    #         upload_eerie_climatologies(
-    #             variables_exp, product=product, experiment=experiment, grid="025"
-    #         )
+    for product in ["clim", "trend"]:
+        upload_obs_climatologies(variables, product=product)
+        for experiment in ["future", "hist", "control"]:  # , "hist-amip"]:
+            if experiment == "hist-amip":
+                variables_exp = variables_amip
+            else:
+                variables_exp = variables
+            logger.info(f"Uploading {product=} for {experiment=}")
+            upload_eerie_climatologies(
+                variables_exp, product=product, experiment=experiment, grid="025"
+            )
     upload_time_series(variables, variables_amip, "IPCC")
     upload_time_series(variables, variables_amip, "EDDY")
 
