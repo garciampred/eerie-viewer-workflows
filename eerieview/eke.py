@@ -71,14 +71,16 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
 
 
 def _fast_time_coord(da: xarray.DataArray) -> numpy.ndarray:
-    """Return the time coordinate without reading all kerchunk file references.
-
-    For daily model output stored in monthly files, reading da.time.values
-    triggers ~1000 individual file reads (one per monthly chunk). Instead we
-    read only the first value and reconstruct assuming a regular daily time-series.
+    """Return the time coordinate reading only the first two values.
+       Falls back to reading all values if the cadence is not strictly 1 day.
     """
-    t0 = da.time[0].values  # reads only the first kerchunk chunk (one file)
-    return t0 + numpy.arange(len(da.time)) * numpy.timedelta64(1, "D")
+    import pandas
+
+    t0 = da.time[0].values
+    t1 = da.time[1].values
+    if t1 - t0 != numpy.timedelta64(1, "D"):
+        return da.time.values
+    return pandas.date_range(pandas.Timestamp(t0), periods=len(da.time), freq="D").values
 
 
 def _init_zarr_store(
