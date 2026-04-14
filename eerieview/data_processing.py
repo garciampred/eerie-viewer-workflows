@@ -393,6 +393,7 @@ def retry_get_entry_with_fixes(
                 rawname = "toscon" if varname == "tos" else "zos"
                 catalog_entry = catalogue[f"dkrz.disk.model-output.{ocean_model}.{ocean_sim}.ocean.gr1.{cmor_table}"]()
                 dataset = catalog_entry.to_dask()[[rawname]]
+                dataset = dataset.sortby("time")
                 #ocean_member = replace(member, model=ocean_model, simulation=ocean_sim, cmor_table=cmor_table, grid="gr1")
                 #dataset = get_entry_dataset_fun(catalogue, ocean_member, rawname, location="levante")
                 return dataset, member, rawname
@@ -403,7 +404,7 @@ def retry_get_entry_with_fixes(
                 rawname = "toscon"
                 member = replace(member, version="v20251126")
             elif rawname == "zos":
-                member = replace(member, version="v20251126")
+                pass  # version stays at v20250425 for Oday/zos
             else:
                 pass
             pattern_to_expand = f"{rawname}_*.nc"
