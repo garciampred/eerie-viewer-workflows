@@ -184,18 +184,16 @@ def get_diagnostic(
         dataset = xarray.open_dataset(nc_file, chunks="auto")
     dataset = dataset[[rawname]].astype("float32")
     if rawname == "eke":
-        # WORKAROUND: Some models (HadGEM3, IFS-NEMO) have artifacts at the
-        # ORCA grid seam (0°/360° lon): HadGEM3 uses 0 as fill value instead
-        # of NaN, and IFS-NEMO leaves NaN at the seam boundary. Both cause a
-        # black meridional line in the viewer.
+        # WORKAROUND: Some models (HadGEM3, IFS-NEMO) have a common grid seam (0°/360° lon) artifact: 
+        # HadGEM3 uses 0 as fill value instead of NaN, and IFS-NEMO leaves NaN at the seam boundary. 
+        # Both cause a black meridional line in the viewer.
         # Fix: convert zeros to NaN, then fill the seam by rolling the array
         # so the boundary is not at the edge, interpolating, and rolling back.
         # TODO: proper fix is in eerieview/eke.py compute_monthly_eke — fill
         # the seam in zos_daily_anom and nan_mask before computing geostrophic
-        # velocities, then regenerate the EKE diagnostic zarrs. However this approach is 
-        # enought for visualisation in eerie-viewer
+        # velocities, then regenerate the EKE diagnostic zarrs.
         dataset = dataset.where(dataset != 0)
-        # Land mask from zos_anom (same ORCA grid). The eke seam artifact comes
+        # Land mask from zos_anom (same ORCA grid).Probably, the eke seam artifact comes
         # from the gradient calculation at the boundary, so zos has valid values
         # at the seam pixels and its all-NaN mask is free of seam artifacts.
         land_mask = _get_or_create_land_mask(diagdir, final_member)
@@ -209,10 +207,8 @@ def get_diagnostic(
         # Restore land mask from zos_anom — unaffected by eke seam artifacts
         dataset = dataset.where(~land_mask)
         # WORKAROUND: mask the equatorial band (±3°) which has unreliable
-        # geostrophic EKE due to vanishing Coriolis. The mask is applied on
-        # the native grid in eke.py but its effective width in the output
-        # varies with model resolution. Re-applying here ensures a consistent
-        # ±3° band across all models after regridding.
+        # geostrophic EKE due to vanishing Coriolis. Fixes artifact seen in IFS-NEMO with very 
+        # narrow equatorial mask, applied to all models to ensure all show same band width.
         dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
     time_index = dataset.time.to_index()
     logger.info(f"Time span for {member} is {time_index[0]} from {time_index[-1]}")
