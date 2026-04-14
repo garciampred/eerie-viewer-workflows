@@ -140,6 +140,32 @@ def get_obs_dataset(obsdir: Path, rawname: str) -> xarray.Dataset:
     return dataset
 
 
+def _get_or_create_land_mask(diagdir: str, slug: str) -> xarray.DataArray:
+    """Return a 2-D land mask (True = land) for an ORCA-grid member.
+
+    The mask is derived from the pre-computed ``zos_anom_*_daily.*`` file in
+    $DIAGSDIR and cached as ``land_mask_{slug}.zarr`` so it is only computed
+    once.  HadGEM3 uses 0 as a fill value, so zeros are converted to NaN
+    before the all-time reduction.
+    """
+    mask_path = Path(diagdir, f"land_mask_{slug}.zarr")
+    if mask_path.exists():
+        return xarray.open_zarr(mask_path)["land_mask"]
+
+    zos_zarr = Path(diagdir, f"zos_anom_{slug}_daily.zarr")
+    zos_nc = Path(diagdir, f"zos_anom_{slug}_daily.nc")
+    if zos_zarr.exists():
+        zos_ds = xarray.open_zarr(zos_zarr)
+    else:
+        zos_ds = xarray.open_dataset(zos_nc, chunks="auto")
+
+    logger.info(f"Computing land mask for {slug} from zos_anom, saving to {mask_path}")
+    zos_da = zos_ds["zos"].astype("float32").where(lambda x: x != 0)
+    land_mask = zos_da.isnull().all("time").compute()
+    land_mask.to_dataset(name="land_mask").to_zarr(mask_path, mode="w")
+    return land_mask
+
+
 def get_diagnostic(
     catalogue: str,
     member: str,
@@ -149,10 +175,45 @@ def get_diagnostic(
 ) -> xarray.Dataset:
     """Retrieve a diagnostic dataset from a specific directory."""
     diagdir = os.environ["DIAGSDIR"]
-    final_member = EERIEMember.from_string(member).slug
-    diagfile = Path(diagdir, f"{rawname}_{final_member}_monthly.nc")
-    dataset = xarray.open_dataset(diagfile)
+    final_member = member.slug if hasattr(member, "slug") else EERIEMember.from_string(member).slug
+    zarr_file = Path(diagdir, f"{rawname}_{final_member}_monthly.zarr")
+    nc_file = Path(diagdir, f"{rawname}_{final_member}_monthly.nc")
+    if zarr_file.exists():
+        dataset = xarray.open_zarr(zarr_file)
+    else:
+        dataset = xarray.open_dataset(nc_file, chunks="auto")
     dataset = dataset[[rawname]].astype("float32")
+    if rawname == "eke":
+        # WORKAROUND: Some models (HadGEM3, IFS-NEMO) have artifacts at the
+        # ORCA grid seam (0°/360° lon): HadGEM3 uses 0 as fill value instead
+        # of NaN, and IFS-NEMO leaves NaN at the seam boundary. Both cause a
+        # black meridional line in the viewer.
+        # Fix: convert zeros to NaN, then fill the seam by rolling the array
+        # so the boundary is not at the edge, interpolating, and rolling back.
+        # TODO: proper fix is in eerieview/eke.py compute_monthly_eke — fill
+        # the seam in zos_daily_anom and nan_mask before computing geostrophic
+        # velocities, then regenerate the EKE diagnostic zarrs. However this approach is 
+        # enought for visualisation in eerie-viewer
+        dataset = dataset.where(dataset != 0)
+        # Land mask from zos_anom (same ORCA grid). The eke seam artifact comes
+        # from the gradient calculation at the boundary, so zos has valid values
+        # at the seam pixels and its all-NaN mask is free of seam artifacts.
+        land_mask = _get_or_create_land_mask(diagdir, final_member)
+        n = dataset.sizes["lon"]
+        dataset = (
+            dataset.roll(lon=n // 2, roll_coords=True)
+            .ffill("lon", limit=10)
+            .bfill("lon", limit=10)
+            .roll(lon=-(n // 2), roll_coords=True)
+        )
+        # Restore land mask from zos_anom — unaffected by eke seam artifacts
+        dataset = dataset.where(~land_mask)
+        # WORKAROUND: mask the equatorial band (±3°) which has unreliable
+        # geostrophic EKE due to vanishing Coriolis. The mask is applied on
+        # the native grid in eke.py but its effective width in the output
+        # varies with model resolution. Re-applying here ensures a consistent
+        # ±3° band across all models after regridding.
+        dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
     time_index = dataset.time.to_index()
     logger.info(f"Time span for {member} is {time_index[0]} from {time_index[-1]}")
     return dataset
