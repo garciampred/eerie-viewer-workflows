@@ -19,7 +19,7 @@ load_dotenv()
 logger = get_logger(__name__)
 
 
-def get_exp_time_series(experiment: str, region_set: str):
+def get_exp_time_series(experiment: str, region_set: str, members: list | None = None):
     """Run the time series generation process for specific model experiments and variables."""
     location: InputLocation = "levante_cmor"
     exp2ref_period = {
@@ -34,25 +34,28 @@ def get_exp_time_series(experiment: str, region_set: str):
         "control": members_eerie_control_cmor,
         "future": members_eerie_future_cmor,
     }
-    members = exp2members[experiment]
+    members = members if members is not None else exp2members[experiment]
     reference_period = exp2ref_period[experiment]
     output_dir = Path(os.environ["PRODUCTSDIR"], "time_series")
 
     # Define the list of variables to process.
+    '''
     variables_to_process = [
-  #      "sfcWind",
-  #      "uas",
-  #      "vas",
-  #      "tas",
-  #      "pr",
+        "sfcWind",
+        "uas",
+        "vas",
+        "tas",
+        "pr",
         "tos",
-        "sos",
-  #      "clt",
-  #      "zos",
-  #      "tasmax",
-  #      "tasmin",
-        #       "eke",
+        #"sos",
+        "clt",
+        "zos",
+        "tasmax",
+        "tasmin",
     ]
+    '''
+
+    variables_to_process = ['eke']
     
     # Iterate through each variable to process.
     for varname in variables_to_process:
@@ -79,20 +82,30 @@ def get_exp_time_series(experiment: str, region_set: str):
             experiment,
             reference_period,
             region_set,
-            clobber=False,
+            clobber=True,
             get_entry_dataset_fun=get_entry_dataset_fun,
             member_class=CmorEerieMember,
         )
 
 
+def members_with_eke_data(members: list) -> list:
+    """Filter member list to only those with a pre-computed eke file (zarr or nc) in DIAGSDIR."""
+    diagdir = os.environ["DIAGSDIR"]
+    result = []
+    for m in members:
+        slug = CmorEerieMember.from_string(m).slug
+        zarr_exists = Path(diagdir, f"eke_{slug}_monthly.zarr").exists()
+        nc_exists = Path(diagdir, f"eke_{slug}_monthly.nc").exists()
+        if zarr_exists or nc_exists:
+            result.append(m)
+    return result
+
+
 def main():
     region_sets = ["IPCC", "EDDY"]
-    experiments = [
-        "hist",
-    ]  # "control"]  # ["control", "hist", "hist-amip", "future"]
     for region_set in region_sets:
-        for exp in experiments:
-            get_exp_time_series(exp, region_set)
+        get_exp_time_series("hist", region_set, members=members_with_eke_data(members_eerie_hist_cmor))
+        get_exp_time_series("future", region_set, members=members_with_eke_data(members_eerie_future_cmor))
 
 
 if __name__ == "__main__":
