@@ -300,9 +300,9 @@ def set_cmor_metadata(dataset: xarray.Dataset, product) -> xarray.Dataset:
             if attrname == "units":
                 if varname_noanom in ["tas", "tasmin", "tasmax", "tos"]:
                     if product == "trend":
-                        attrval = "degC"
-                    else:
                         attrval = "degC decade-1"
+                    else:
+                        attrval = "degC"
                 if varname_noanom == "pr":
                     attrval = "mm day-1"
             if "anom" in str(varname):
@@ -353,8 +353,10 @@ def main():
             upload_eerie_climatologies(
                 variables_exp, product=product, experiment=experiment, grid="025"
             )
-    upload_time_series(variables, variables_amip, "IPCC")
-    upload_time_series(variables, variables_amip, "EDDY")
+    #upload_time_series(variables, variables_amip, "IPCC")
+    #upload_time_series(variables, variables_amip, "EDDY")
+
+
 
 
 if __name__ == "__main__":
