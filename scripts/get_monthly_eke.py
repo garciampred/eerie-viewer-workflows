@@ -66,9 +66,7 @@ def compute_eke_for_member(
                 catalogue, get_entry_dataset, location, member, rawname, varname
             )
         # Rechunk before compute_monthly_eke.
-        # Input data often has full spatial in one chunk (e.g. 32 x 721 x 1440),
-        # which creates very large dask graphs when rechunking to time=-1 inside
-        # write_clim_and_anom. Pre-chunking to lat=50, lon=50 (matching the block
+        # Pre-chunking to lat=50, lon=50 (matching the block
         # size) reduces the number of dask tasks per block, even though the
         # underlying stored chunks may be smaller.
         dataset = dataset.chunk(dict(time=32, lat=50, lon=50))
