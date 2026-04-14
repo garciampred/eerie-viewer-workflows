@@ -353,10 +353,8 @@ def main():
             upload_eerie_climatologies(
                 variables_exp, product=product, experiment=experiment, grid="025"
             )
-    #upload_time_series(variables, variables_amip, "IPCC")
-    #upload_time_series(variables, variables_amip, "EDDY")
-
-
+    upload_time_series(variables, variables_amip, "IPCC")
+    upload_time_series(variables, variables_amip, "EDDY")
 
 
 if __name__ == "__main__":
