@@ -64,6 +64,22 @@ def main_zos():
     )
 
 
+def main_eke_to_netcdf():
+    storage_dir = Path(os.environ["DOWNLOADIR"], "aviso")
+    obsdir = Path(os.environ["OBSDIR"])
+
+    zarr_path = Path(storage_dir, "eke_AVISO_mon_199301-202206.zarr")
+    dataset = xarray.open_zarr(zarr_path)
+
+    timeindex = dataset.time.to_index()
+    mintime = f"{timeindex[0]:%Y%m}"
+    maxtime = f"{timeindex[-1]:%Y%m}"
+    output_path = Path(obsdir, f"eke_AVISO_mon_{mintime}-{maxtime}.nc")
+
+    safe_to_netcdf(dataset, output_path, encoding=dict(eke=DEFAULT_ENCODING), show_progress=True)
+
+
 if __name__ == "__main__":
-    main_eke()
+    #main_eke()
+    main_eke_to_netcdf()
 
