@@ -166,6 +166,32 @@ def _get_or_create_land_mask(diagdir: str, slug: str) -> xarray.DataArray:
     return land_mask
 
 
+def _fix_eke_artifacts(dataset: xarray.Dataset, diagdir: str, slug: str) -> xarray.Dataset:
+    """Fix known EKE artifacts in pre-computed diagnostic zarrs (for visualisation purposes only!).
+
+    1. Zero → NaN: HadGEM3 uses 0 as fill value instead of NaN.
+    2. Seam fix: roll the array so the 0°/360° lon boundary is not at the edge,
+       fill up to 10 pixels in each direction, then roll back. Fixes the black
+       meridional line caused by gradient artefacts at the seam in IFS-NEMO and HadGEM3.
+    3. Land mask restore: use the zos_anom land mask (free of seam artefacts)
+       to re-mask ocean/land after the fill.
+    4. Equatorial mask (±3°): geostrophic EKE is unreliable near the equator
+       due to vanishing Coriolis. Applied here rather than relying on eke.py
+       so we are sure that pre-computed zarrs are corrected consistently.
+    """
+    dataset = dataset.where(dataset != 0)
+    land_mask = _get_or_create_land_mask(diagdir, slug)
+    n = dataset.sizes["lon"]
+    dataset = (
+        dataset.roll(lon=n // 2, roll_coords=True)
+        .ffill("lon", limit=10)
+        .bfill("lon", limit=10)
+        .roll(lon=-(n // 2), roll_coords=True)
+    )
+    dataset = dataset.where(~land_mask)
+    dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
+    return dataset
+
 def get_diagnostic(
     catalogue: str,
     member: str,
@@ -184,32 +210,7 @@ def get_diagnostic(
         dataset = xarray.open_dataset(nc_file, chunks="auto")
     dataset = dataset[[rawname]].astype("float32")
     if rawname == "eke":
-        # WORKAROUND: Some models (HadGEM3, IFS-NEMO) have a common grid seam (0°/360° lon) artifact: 
-        # HadGEM3 uses 0 as fill value instead of NaN, and IFS-NEMO leaves NaN at the seam boundary. 
-        # Both cause a black meridional line in the viewer.
-        # Fix: convert zeros to NaN, then fill the seam by rolling the array
-        # so the boundary is not at the edge, interpolating, and rolling back.
-        # TODO: proper fix is in eerieview/eke.py compute_monthly_eke — fill
-        # the seam in zos_daily_anom and nan_mask before computing geostrophic
-        # velocities, then regenerate the EKE diagnostic zarrs.
-        dataset = dataset.where(dataset != 0)
-        # Land mask from zos_anom (same ORCA grid).Probably, the eke seam artifact comes
-        # from the gradient calculation at the boundary, so zos has valid values
-        # at the seam pixels and its all-NaN mask is free of seam artifacts.
-        land_mask = _get_or_create_land_mask(diagdir, final_member)
-        n = dataset.sizes["lon"]
-        dataset = (
-            dataset.roll(lon=n // 2, roll_coords=True)
-            .ffill("lon", limit=10)
-            .bfill("lon", limit=10)
-            .roll(lon=-(n // 2), roll_coords=True)
-        )
-        # Restore land mask from zos_anom — unaffected by eke seam artifacts
-        dataset = dataset.where(~land_mask)
-        # WORKAROUND: mask the equatorial band (±3°) which has unreliable
-        # geostrophic EKE due to vanishing Coriolis. Fixes artifact seen in IFS-NEMO with very 
-        # narrow equatorial mask, applied to all models to ensure all show same band width.
-        dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
+        dataset = _fix_eke_artifacts(dataset, diagdir, final_member)
     time_index = dataset.time.to_index()
     logger.info(f"Time span for {member} is {time_index[0]} from {time_index[-1]}")
     return dataset
