@@ -157,7 +157,7 @@ def main():
     reference_period_era5 = (1951, 1980)
     periods_era5 = [(1971, 2000), (1991, 2020)]
     periods_config_era5 = PeriodsConfig(reference_period_era5, periods_era5)
-    product: DecadalProduct = "trend"
+    product: DecadalProduct = "clim"
 
     # List of variables to process for ERA5.
     variables_era5 = [
@@ -202,6 +202,24 @@ def main():
             output_dir,
             periods_config_aviso,
             "aviso",
+            product,
+            clobber=True,
+        )
+
+    # --- ORAS5 Data Processing ---
+    reference_period_oras5 = (1958, 1980)
+    periods_oras5 = [(1971, 2000), (1991,2020)]
+    periods_config_oras5 = PeriodsConfig(reference_period_oras5, periods_oras5)
+    product: DecadalProduct = "clim"
+
+    for varname in ["sos"]:
+        logger.info(f"Processing ORAS5 data for variable: {varname}")
+        get_obs_decadal_product(
+            varname,
+            obsdir,
+            output_dir,
+            periods_config_oras5,
+            "oras5",
             product,
             clobber=False,
         )

@@ -120,6 +120,8 @@ def get_obs_dataset(obsdir: Path, rawname: str) -> xarray.Dataset:
     """
     if rawname in ["eke", "zos"]:
         ipath = Path(obsdir, f"{rawname}_AVISO_mon_199301-202206.nc")
+    elif rawname == "sos":
+        ipath = Path(obsdir, "sos_ORAS5_mon_195801-202212.nc")
     else:
         ipath = Path(obsdir, f"{rawname}_ERA5_mon_194001-202212.nc")
 
@@ -132,9 +134,63 @@ def get_obs_dataset(obsdir: Path, rawname: str) -> xarray.Dataset:
         )
     elif "valid_time" in dataset.dims:
         dataset = dataset.rename(dict(valid_time="time"))
+    elif "time_counter" in dataset.dims:
+        dataset = dataset.rename(dict(time_counter="time"))
 
     return dataset
 
+
+def _get_or_create_land_mask(diagdir: str, slug: str) -> xarray.DataArray:
+    """Return a 2-D land mask (True = land) for an ORCA-grid member.
+
+    The mask is derived from the pre-computed ``zos_anom_*_daily.*`` file in
+    $DIAGSDIR and cached as ``land_mask_{slug}.zarr`` so it is only computed
+    once.  HadGEM3 uses 0 as a fill value, so zeros are converted to NaN
+    before the all-time reduction.
+    """
+    mask_path = Path(diagdir, f"land_mask_{slug}.zarr")
+    if mask_path.exists():
+        return xarray.open_zarr(mask_path)["land_mask"]
+
+    zos_zarr = Path(diagdir, f"zos_anom_{slug}_daily.zarr")
+    zos_nc = Path(diagdir, f"zos_anom_{slug}_daily.nc")
+    if zos_zarr.exists():
+        zos_ds = xarray.open_zarr(zos_zarr)
+    else:
+        zos_ds = xarray.open_dataset(zos_nc, chunks="auto")
+
+    logger.info(f"Computing land mask for {slug} from zos_anom, saving to {mask_path}")
+    zos_da = zos_ds["zos"].astype("float32").where(lambda x: x != 0)
+    land_mask = zos_da.isnull().all("time").compute()
+    land_mask.to_dataset(name="land_mask").to_zarr(mask_path, mode="w")
+    return land_mask
+
+
+def _fix_eke_artifacts(dataset: xarray.Dataset, diagdir: str, slug: str) -> xarray.Dataset:
+    """Fix known EKE artifacts in pre-computed diagnostic zarrs (for visualisation purposes only!).
+
+    1. Zero → NaN: HadGEM3 uses 0 as fill value instead of NaN.
+    2. Seam fix: roll the array so the 0°/360° lon boundary is not at the edge,
+       fill up to 10 pixels in each direction, then roll back. Fixes the black
+       meridional line caused by gradient artefacts at the seam in IFS-NEMO and HadGEM3.
+    3. Land mask restore: use the zos_anom land mask (free of seam artefacts)
+       to re-mask ocean/land after the fill.
+    4. Equatorial mask (±3°): geostrophic EKE is unreliable near the equator
+       due to vanishing Coriolis. Applied here rather than relying on eke.py
+       so we are sure that pre-computed zarrs are corrected consistently.
+    """
+    dataset = dataset.where(dataset != 0)
+    land_mask = _get_or_create_land_mask(diagdir, slug)
+    n = dataset.sizes["lon"]
+    dataset = (
+        dataset.roll(lon=n // 2, roll_coords=True)
+        .ffill("lon", limit=10)
+        .bfill("lon", limit=10)
+        .roll(lon=-(n // 2), roll_coords=True)
+    )
+    dataset = dataset.where(~land_mask)
+    dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
+    return dataset
 
 def get_diagnostic(
     catalogue: str,
@@ -145,10 +201,16 @@ def get_diagnostic(
 ) -> xarray.Dataset:
     """Retrieve a diagnostic dataset from a specific directory."""
     diagdir = os.environ["DIAGSDIR"]
-    final_member = EERIEMember.from_string(member).slug
-    diagfile = Path(diagdir, f"{rawname}_{final_member}_monthly.nc")
-    dataset = xarray.open_dataset(diagfile)
+    final_member = member.slug if hasattr(member, "slug") else EERIEMember.from_string(member).slug
+    zarr_file = Path(diagdir, f"{rawname}_{final_member}_monthly.zarr")
+    nc_file = Path(diagdir, f"{rawname}_{final_member}_monthly.nc")
+    if zarr_file.exists():
+        dataset = xarray.open_zarr(zarr_file)
+    else:
+        dataset = xarray.open_dataset(nc_file, chunks="auto")
     dataset = dataset[[rawname]].astype("float32")
+    if rawname == "eke":
+        dataset = _fix_eke_artifacts(dataset, diagdir, final_member)
     time_index = dataset.time.to_index()
     logger.info(f"Time span for {member} is {time_index[0]} from {time_index[-1]}")
     return dataset
