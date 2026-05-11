@@ -3,9 +3,18 @@ from xarray_regrid import Grid
 
 
 def main():
-    ifile_hires = "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N640-ORCA12/eerie-ssp245/r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dq389_1d_20500101-20500201_grid-025.nc"
-    ifile_midres = "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N216-ORCA025/eerie-ssp245/r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dg002_1d_20500101-20500201_grid-025.nc"
-    ifile_lowres = "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N96-ORCA1/eerie-ssp245/r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dc015_1d_20500101-20500201_grid-025.nc"
+    ifile_hires = (
+        "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N640-ORCA12/eerie-ssp245/"
+        "r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dq389_1d_20500101-20500201_grid-025.nc"
+    )
+    ifile_midres = (
+        "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N216-ORCA025/eerie-ssp245/"
+        "r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dg002_1d_20500101-20500201_grid-025.nc"
+    )
+    ifile_lowres = (
+        "/work/bm1344/DKRZ/MOHC/HadGEM3-GC5-EERIE-N96-ORCA1/eerie-ssp245/"
+        "r1i1p1f1/Oday/zos/gr1/v20250425/zos_nemo_u-dc015_1d_20500101-20500201_grid-025.nc"
+    )
     grid_hires = Grid(
         north=90,
         east=180,

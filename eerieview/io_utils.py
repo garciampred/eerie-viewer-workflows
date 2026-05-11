@@ -19,7 +19,7 @@ def safe_to_netcdf(
     """Safely write a netCDF so it does not remain incomplete in case of an
     interruption.
     """
-    with tempfile.TemporaryDirectory() as tmpdir:
+    with tempfile.TemporaryDirectory(dir=output_path.parent) as tmpdir:
         temp_output_path = Path(tmpdir, output_path.name)
         logger.info(f"Writing netCDF to {temp_output_path}")
 

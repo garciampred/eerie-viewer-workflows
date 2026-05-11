@@ -14,7 +14,7 @@ def main():
         "ifs-fesom",
         "icon",
         "ifs-nemo-er",
-        "hadgem3-mediumres",
+        #        "hadgem3-mediumres",
         "hadgem3-hires",
         "hadgem3-lowres",
     ]
@@ -70,7 +70,7 @@ def main():
         "zos",
         "tasmax",
         "tasmin",
-        # "eke",
+        "eke",
     ]
     region_sets = ["IPCC", "EDDY"]
     variables_amip = [v for v in variables_coupled if v not in ["zos", "eke"]]

@@ -1,4 +1,4 @@
-import copy
+from dataclasses import replace
 from datetime import datetime
 from functools import reduce
 from pathlib import Path
@@ -163,6 +163,11 @@ def get_model_decadal_product(
                 "ifs-fesom2-sr",
             ]:
                 member_obj = member_obj.to_daily()
+            elif varname in ["tasmax", "tasmin"] and member_obj.model in [
+                "HadGEM3-GC5E-HH",
+                "HadGEM3-GC5E-LL",
+            ]:
+                member_obj = replace(member_obj, cmor_table="AmonExtremes")
         else:
             rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(
@@ -242,18 +247,10 @@ def get_complete_input_dataset(
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        if (
-            "nemo" in member.model.lower()
-            and rawname == "pr"
-            and dataset_future[rawname].attrs["units"] == "kg m-2 s-1"
-        ):
-            dataset_future["pr"] *= 3600 * 24
-            dataset_future["pr"].attrs["units"] = "mm"
-
         if "hadgem" in member.model.lower():
-            member_hist = copy.replace(member, simulation="eerie-historical")
+            member_hist = replace(member, simulation="historical")
         else:
-            member_hist = copy.replace(member, simulation="hist-1950")
+            member_hist = replace(member, simulation="hist-1950")
         member_hist = rename_realm(member_hist, varname)
         dataset_hist, _, rawname = get_member_dataset(
             catalogue,
@@ -287,6 +284,18 @@ def get_member_dataset(
         dataset, member, rawname = retry_get_entry_with_fixes(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
+    except Exception as e:
+        # For CmorEerieMember, kerchunk can fail with zlib/reference errors on truncated files.
+        # Fall back to reading directly from disk.
+        if isinstance(member, CmorEerieMember):
+            logger.warning(
+                f"Kerchunk access failed ({type(e).__name__}: {e}), falling back to disk for {member}"
+            )
+            dataset, member, rawname = retry_get_entry_with_fixes(
+                catalogue, get_entry_dataset_fun, location, member, rawname, varname
+            )
+        else:
+            raise
     logger.info(dataset)
     # Handle realization dimension if present by averaging
     if "realization" in dataset:
@@ -388,6 +397,11 @@ def get_model_time_series(
             rawname = varname
             if varname in ["tasmax", "tasmin"] and "icon" in member_obj.model:
                 member_obj = member_obj.to_daily()
+            elif varname in ["tasmax", "tasmin"] and member_obj.model in [
+                "HadGEM3-GC5E-HH",
+                "HadGEM3-GC5E-LL",
+            ]:
+                member_obj = replace(member_obj, cmor_table="AmonExtremes")
         else:
             rawname = get_raw_variable_name(member_str, varname)
         dataset, member, rawname = get_complete_input_dataset(

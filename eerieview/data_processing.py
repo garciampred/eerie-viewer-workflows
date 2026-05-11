@@ -1,5 +1,5 @@
-import copy
 import importlib
+from dataclasses import replace
 from datetime import datetime
 from itertools import chain
 from pathlib import Path
@@ -148,7 +148,7 @@ def seltime(
         if time_unit not in ("year", "season", "month", "day", "hour"):
             raise KeyError(f"Time unit '{time_unit}' not supported.")
         time_str = f"{time_coord}.{time_unit}"
-        time_mask_temp = numpy.in1d(ids[time_str], time_values)
+        time_mask_temp = numpy.isin(ids[time_str], time_values)
         time_mask = numpy.logical_and(time_mask, time_mask_temp)
     ods = ids.isel(**{time_coord: time_mask})  # type: ignore
     return ods
@@ -379,13 +379,35 @@ def retry_get_entry_with_fixes(
             grid = "gr"
             pattern_to_expand = f"{rawname}_{member.cmor_table}_*.nc"
         elif "hadgem3" in member.model.lower():
+            hadgem_atmos2ocean = {
+                "HadGEM3-GC5E-LL": "hadgem3-gc5-n96-orca1",
+                "HadGEM3-GC5E-HH": "hadgem3-gc5-n640-orca12",
+            }
+
+            hadgem_sim2ocean = {
+                "historical": "eerie-historical",
+                "ssp245": "eerie-ssp245",
+            }
+
+            if member.model in hadgem_atmos2ocean and varname in ["tos", "zos"]:
+                ocean_model = hadgem_atmos2ocean[member.model]
+                ocean_sim = hadgem_sim2ocean[member.simulation]
+                cmor_table = "Omon" if varname == "tos" else "Oday"
+                rawname = "toscon" if varname == "tos" else "zos"
+                catalog_entry = catalogue[
+                    f"dkrz.disk.model-output.{ocean_model}.{ocean_sim}.ocean.gr1.{cmor_table}"
+                ]()
+                dataset = catalog_entry.to_dask()[[rawname]]
+                dataset = dataset.sortby("time")
+                return dataset, member, rawname
+
             basedir = Path(f"/work/bm1344/DKRZ/MOHC/{member.model}")
             grid = "gr1"
             if rawname == "tos":
                 rawname = "toscon"
-                member = copy.replace(member, version="v20251126")
+                member = replace(member, version="v20251126")
             elif rawname == "zos":
-                member = copy.replace(member, version="v20251126")
+                pass  # version stays at v20250425 for Oday/zos
             else:
                 pass
             pattern_to_expand = f"{rawname}_*.nc"
@@ -484,7 +506,9 @@ def add_anomalies(
     return final_dataset
 
 
-def fix_units(dataset: xarray.Dataset, varname: str, product: str = None) -> xarray.Dataset:
+def fix_units(
+    dataset: xarray.Dataset, varname: str, product: str | None = None
+) -> xarray.Dataset:
     """Fix units of certain variables to a common standard (e.g., K to degC, m/s to mm/day)."""
     if varname == "pr":
         units = dataset[varname].attrs.get("units", "")
@@ -499,7 +523,7 @@ def fix_units(dataset: xarray.Dataset, varname: str, product: str = None) -> xar
     if (
         varname in ["tasmax", "tasmin", "tas", "tos"]
         and dataset[varname].isel(time=5).max().compute().item() > 200
-        and product !="trend"
+        and product != "trend"
     ):
         dataset[varname] = dataset[varname] - 273.15
         dataset[varname].attrs["units"] = "degC"
@@ -513,22 +537,22 @@ def rename_realm(member: Member, varname: str) -> Member:
     """Adjust the member string based on the variable's realm (e.g., atmos to ocean)."""
     # For ocean variables, change 'atmos' to 'ocean' in member string
     if (
-        varname in OCEAN_VARIABLES
+        isinstance(member, EERIEMember)
+        and varname in OCEAN_VARIABLES
         and "amip" != member.simulation
-        and not isinstance(member, CmorEerieMember)
     ):
-        member = copy.replace(member, realm="ocean")
+        member = replace(member, realm="ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
         if "ifs-fesom2-sr" == member.model and (
             "hist" in member.simulation or "control" in member.simulation
         ):
-            member = copy.replace(member, freq="daily_1950-2014")
+            member = replace(member, freq="daily_1950-2014")
     # Adjust member string for ICON tasmax/tasmin variables
     if (
-        "icon" in member.model
+        isinstance(member, EERIEMember)
+        and "icon" in member.model
         and varname in ["tasmax", "tasmin"]
-        and not isinstance(member, CmorEerieMember)
     ):
         extreme = "max" if varname == "tasmax" else "min"
-        member = copy.replace(member, freq=f"daily_{extreme}")
+        member = replace(member, freq=f"daily_{extreme}")
     return member

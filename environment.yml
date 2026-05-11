@@ -29,6 +29,7 @@ dependencies:
 - fastparquet
 - python-dotenv
 - xarray-regrid
+- bottleneck
 - numcodecs <0.16
 - blosc
 - pip:
