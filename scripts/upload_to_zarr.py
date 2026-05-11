@@ -70,7 +70,7 @@ def get_encoding(ds: xarray.Dataset, chunks: dict[str, int]):
     encoding = {}
     for v in ds.data_vars:
         # Match chunks to dimension order of the variable
-        var_chunks = tuple(chunks.get(d, -1) for d in ds[v].dims)
+        var_chunks = tuple(chunks.get(str(d), -1) for d in ds[v].dims)
         encoding[v] = dict(dtype="float32", chunks=var_chunks)
     return encoding
 
@@ -108,7 +108,6 @@ def upload_eerie_climatologies(
     fs = get_filesystem()
     # Create an S3 store
     store = zarr.storage.FSStore(zarr_url, fs=fs)
-    logger.info(dataset.info())
     if fs.exists(zarr_url):
         logger.info(f"Clearing existing store {zarr_url}")
         fs.rm(zarr_url, recursive=True)
@@ -144,7 +143,6 @@ def upload_obs_climatologies(variables: list[str], product="clim"):
     encoding = get_encoding(dataset, chunks)
     fs = get_filesystem()
     # Create an S3 store
-    logger.info(dataset.info())
     store = zarr.storage.FSStore(zarr_url, fs=fs)
     if fs.exists(zarr_url):
         logger.info(f"Clearing existing store {zarr_url}")

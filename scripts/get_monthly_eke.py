@@ -38,7 +38,7 @@ def compute_eke_for_member(
     # Input data must be daily and ocean
     member = member.to_ocean().to_daily()
     member_str = member.to_string()
-    if (
+    if isinstance(member, CmorEerieMember) and (
         "ifs-nemo" in member.model
         or "ifs-fesom2-sr" in member.model
         or "icon" in member.model

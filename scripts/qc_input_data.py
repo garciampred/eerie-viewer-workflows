@@ -57,7 +57,7 @@ def check_variable_data(
             varname,
         )
         times = dataset.time.to_index()
-        if "mon" in member.cmor_table:
+        if isinstance(member, CmorEerieMember) and "mon" in member.cmor_table:
             freq = "MS"
             dataset["time"] = [t.replace(day=1, hour=0, minute=0) for t in times]
         else:

@@ -148,7 +148,7 @@ def seltime(
         if time_unit not in ("year", "season", "month", "day", "hour"):
             raise KeyError(f"Time unit '{time_unit}' not supported.")
         time_str = f"{time_coord}.{time_unit}"
-        time_mask_temp = numpy.in1d(ids[time_str], time_values)
+        time_mask_temp = numpy.isin(ids[time_str], time_values)
         time_mask = numpy.logical_and(time_mask, time_mask_temp)
     ods = ids.isel(**{time_coord: time_mask})  # type: ignore
     return ods
@@ -507,7 +507,7 @@ def add_anomalies(
 
 
 def fix_units(
-    dataset: xarray.Dataset, varname: str, product: str = None
+    dataset: xarray.Dataset, varname: str, product: str | None = None
 ) -> xarray.Dataset:
     """Fix units of certain variables to a common standard (e.g., K to degC, m/s to mm/day)."""
     if varname == "pr":
@@ -537,9 +537,9 @@ def rename_realm(member: Member, varname: str) -> Member:
     """Adjust the member string based on the variable's realm (e.g., atmos to ocean)."""
     # For ocean variables, change 'atmos' to 'ocean' in member string
     if (
-        varname in OCEAN_VARIABLES
+        isinstance(member, EERIEMember)
+        and varname in OCEAN_VARIABLES
         and "amip" != member.simulation
-        and not isinstance(member, CmorEerieMember)
     ):
         member = replace(member, realm="ocean")
         # Specific fix for 'ifs-fesom2-sr' ocean data
@@ -549,9 +549,9 @@ def rename_realm(member: Member, varname: str) -> Member:
             member = replace(member, freq="daily_1950-2014")
     # Adjust member string for ICON tasmax/tasmin variables
     if (
-        "icon" in member.model
+        isinstance(member, EERIEMember)
+        and "icon" in member.model
         and varname in ["tasmax", "tasmin"]
-        and not isinstance(member, CmorEerieMember)
     ):
         extreme = "max" if varname == "tasmax" else "min"
         member = replace(member, freq=f"daily_{extreme}")

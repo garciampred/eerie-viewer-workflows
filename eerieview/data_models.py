@@ -63,7 +63,7 @@ class EERIEMember(Member):
         return new
 
     def to_daily(self) -> "EERIEMember":
-        new = copy.replace(self)
+        new = copy.copy(self)
         new.freq = "daily"
         return new
 

@@ -187,13 +187,12 @@ def write_clim_and_anom(
             clim_ds = clim.to_dataset()
 
             # Drop coords already written during store initialisation
-            write_kwargs = dict(consolidated=False)
             region = {"lat": lat_sl, "lon": lon_sl}
             clim_ds.drop_vars(list(clim_ds.coords)).to_zarr(
-                clim_tmp, region=region, **write_kwargs
+                clim_tmp, region=region, consolidated=False
             )
             anom.drop_vars(list(anom.coords)).to_zarr(
-                anom_tmp, region=region, **write_kwargs
+                anom_tmp, region=region, consolidated=False
             )
             del raw, clim, clim_ds, anom
             gc.collect()
