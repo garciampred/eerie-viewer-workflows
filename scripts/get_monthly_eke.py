@@ -28,7 +28,10 @@ logger = get_logger(__name__)
 
 
 def compute_eke_for_member(
-    member: Member, location: InputLocation, clobber: bool = False, num_workers: int | None = None
+    member: Member,
+    location: InputLocation,
+    clobber: bool = False,
+    num_workers: int | None = None,
 ):
     varname = "zos"
     output_dir = os.environ["DIAGSDIR"]
@@ -48,7 +51,9 @@ def compute_eke_for_member(
         output_dir, f"zos_clim_{final_member}_dayofyear.zarr"
     )
     daily_anom_zos_file = Path(output_dir, f"zos_anom_{final_member}_daily.zarr")
-    if (output_path.exists() or output_path.with_suffix(".nc").exists()) and not clobber:
+    if (
+        output_path.exists() or output_path.with_suffix(".nc").exists()
+    ) and not clobber:
         logger.info(f"{output_path} already exists")
     else:
         # Open the catalogue entry
@@ -73,9 +78,10 @@ def compute_eke_for_member(
         # Rename to CMOR names
         dataset_cmor = to_cmor_names(dataset, rawname, varname)
         # Run computation
-        print(dataset)
         eke_monthly = compute_monthly_eke(
-            dataset_cmor, daily_anom_zos_file, zos_daily_climatology_file,
+            dataset_cmor,
+            daily_anom_zos_file,
+            zos_daily_climatology_file,
             num_workers=num_workers,
         )
         safe_to_zarr(
@@ -97,7 +103,9 @@ def main():
         logger.info(f"Computing monthly EKE for {member_str}")
         try:
             member = CmorEerieMember.from_string(member_str)
-            compute_eke_for_member(member, location, clobber=False, num_workers=num_workers)
+            compute_eke_for_member(
+                member, location, clobber=False, num_workers=num_workers
+            )
         except Exception as e:
             raise
             #            logger.warning(f"EKE computation failed for {member_str} with error {e}")

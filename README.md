@@ -19,8 +19,8 @@ The following is a schematic description of the main workflow:
 - Open the entry in the catalogue as an xarray dataset.
 - Rename the variable if needed together with coordinates.
 - Loop over the analysis dimensions (time_filter, period). For each of them compute the product, regrid to a common grid using conservative regridding, add the analysis dimensions as dimensions to the xarray dataset and append it to a list.
-- Merge all the products into a single dataset and save it to netCDF using dask.
-- A separate script converts the netCDFs to zarr and uploads it to the storage, defining the chunks so there is a single chunk for each map or time series.
+- Merge all the products into a single dataset and save it to netCDF or zarr depending on the workflow.
+- A separate script uploads the generated datasets to object storage as zarr, defining the chunks so there is a single chunk for each map or time series.
 
 ## Instalation and configuration
 
@@ -59,7 +59,7 @@ PYTHONPATH. The following are the main scripts:
 - get_climatologies: It computes the decadal products from the EERIE data, which are climatologies but also trends.
 - get_obs_climatologies: Computes climatologies and trends for observations. Currently ERA5 and AVISO data are supported. These are not read from intake catalogues but need to be present as files in the disk.
 - download_era5.py: Script to download ERA5 filse
-- get_monthly.eke: Computes the monthly Eddy Kinetic Energy from daily sea level data from EERIE models.
+- get_monthly_eke.py: Computes the monthly Eddy Kinetic Energy from daily sea level data from EERIE models.
 - get_aviso_monthly_variables.py: Computes monthly data from the AVISO observations.
 - get_time_series: Computes regionally averaged time series from EERIE data
 - get_obs_time_series: Computes regionally averaged time series from the observations.

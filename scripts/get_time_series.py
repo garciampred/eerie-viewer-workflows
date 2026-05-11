@@ -34,12 +34,10 @@ def get_exp_time_series(experiment: str, region_set: str, members: list | None =
         "control": members_eerie_control_cmor,
         "future": members_eerie_future_cmor,
     }
-    members = members if members is not None else exp2members[experiment]
     reference_period = exp2ref_period[experiment]
     output_dir = Path(os.environ["PRODUCTSDIR"], "time_series")
+    base_members = members if members is not None else exp2members[experiment]
 
-    # Define the list of variables to process.
-    '''
     variables_to_process = [
         "sfcWind",
         "uas",
@@ -47,18 +45,21 @@ def get_exp_time_series(experiment: str, region_set: str, members: list | None =
         "tas",
         "pr",
         "tos",
-        #"sos",
+        "sos",
         "clt",
         "zos",
         "tasmax",
         "tasmin",
+        "eke",
     ]
-    '''
 
-    variables_to_process = ['eke']
-    
     # Iterate through each variable to process.
     for varname in variables_to_process:
+        if varname == "eke":
+            members_for_var = members_with_eke_data(base_members)
+        else:
+            members_for_var = base_members
+
         # Skip specific variables for the 'hist-amip' experiment if they are not relevant.
         if experiment == "hist-amip" and varname in ["eke", "zos", "sos"]:
             logger.info(f"Skipping {varname} for {experiment} experiment.")
@@ -67,7 +68,7 @@ def get_exp_time_series(experiment: str, region_set: str, members: list | None =
         # Determine the appropriate function to get the initial dataset.
         # 'eke' often requires a special diagnostic function.
         get_entry_dataset_fun: Callable
-        if varname in ["eke"]:
+        if varname == "eke":
             get_entry_dataset_fun = get_diagnostic
         else:
             get_entry_dataset_fun = get_entry_dataset
@@ -78,7 +79,7 @@ def get_exp_time_series(experiment: str, region_set: str, members: list | None =
             varname,
             location,
             output_dir,
-            members,
+            members_for_var,
             experiment,
             reference_period,
             region_set,
@@ -104,8 +105,9 @@ def members_with_eke_data(members: list) -> list:
 def main():
     region_sets = ["IPCC", "EDDY"]
     for region_set in region_sets:
-        get_exp_time_series("hist", region_set, members=members_with_eke_data(members_eerie_hist_cmor))
-        get_exp_time_series("future", region_set, members=members_with_eke_data(members_eerie_future_cmor))
+        get_exp_time_series("control", region_set, members=members_eerie_control_cmor)
+        get_exp_time_series("hist", region_set, members=members_eerie_hist_cmor)
+        get_exp_time_series("future", region_set, members=members_eerie_future_cmor)
 
 
 if __name__ == "__main__":

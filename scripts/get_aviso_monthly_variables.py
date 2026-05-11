@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 from eerieview.eke import DEFAULT_ENCODING, compute_monthly_eke
 from eerieview.io_utils import safe_to_netcdf, safe_to_zarr
 
-
 # Crear el cluster Dask ANTES de cargar datos
 
 load_dotenv()
+
 
 def main_eke():
     dask.config.set(scheduler="synchronous")
@@ -76,10 +76,11 @@ def main_eke_to_netcdf():
     maxtime = f"{timeindex[-1]:%Y%m}"
     output_path = Path(obsdir, f"eke_AVISO_mon_{mintime}-{maxtime}.nc")
 
-    safe_to_netcdf(dataset, output_path, encoding=dict(eke=DEFAULT_ENCODING), show_progress=True)
+    safe_to_netcdf(
+        dataset, output_path, encoding=dict(eke=DEFAULT_ENCODING), show_progress=True
+    )
 
 
 if __name__ == "__main__":
-    #main_eke()
+    main_eke()
     main_eke_to_netcdf()
-

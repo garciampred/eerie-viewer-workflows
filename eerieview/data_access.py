@@ -166,7 +166,9 @@ def _get_or_create_land_mask(diagdir: str, slug: str) -> xarray.DataArray:
     return land_mask
 
 
-def _fix_eke_artifacts(dataset: xarray.Dataset, diagdir: str, slug: str) -> xarray.Dataset:
+def _fix_eke_artifacts(
+    dataset: xarray.Dataset, diagdir: str, slug: str
+) -> xarray.Dataset:
     """Fix known EKE artifacts in pre-computed diagnostic zarrs (for visualisation purposes only!).
 
     1. Zero → NaN: HadGEM3 uses 0 as fill value instead of NaN.
@@ -192,6 +194,7 @@ def _fix_eke_artifacts(dataset: xarray.Dataset, diagdir: str, slug: str) -> xarr
     dataset = dataset.where((dataset.lat < -3) | (dataset.lat > 3))
     return dataset
 
+
 def get_diagnostic(
     catalogue: str,
     member: str,
@@ -201,7 +204,9 @@ def get_diagnostic(
 ) -> xarray.Dataset:
     """Retrieve a diagnostic dataset from a specific directory."""
     diagdir = os.environ["DIAGSDIR"]
-    final_member = member.slug if hasattr(member, "slug") else EERIEMember.from_string(member).slug
+    final_member = (
+        member.slug if hasattr(member, "slug") else EERIEMember.from_string(member).slug
+    )
     zarr_file = Path(diagdir, f"{rawname}_{final_member}_monthly.zarr")
     nc_file = Path(diagdir, f"{rawname}_{final_member}_monthly.nc")
     if zarr_file.exists():

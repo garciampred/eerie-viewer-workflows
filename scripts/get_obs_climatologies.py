@@ -106,7 +106,7 @@ def get_obs_decadal_product(
             )
 
             # Fix units of the variable if necessary (e.g., temperature from K to degC, precipitation units).
-            
+
             climatologies.append(dataset_product)
 
     # Merge all individual product datasets into a single xarray Dataset.
@@ -208,7 +208,7 @@ def main():
 
     # --- ORAS5 Data Processing ---
     reference_period_oras5 = (1958, 1980)
-    periods_oras5 = [(1971, 2000), (1991,2020)]
+    periods_oras5 = [(1971, 2000), (1991, 2020)]
     periods_config_oras5 = PeriodsConfig(reference_period_oras5, periods_oras5)
     product: DecadalProduct = "clim"
 

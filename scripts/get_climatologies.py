@@ -34,7 +34,7 @@ VARIABLES = [
     "pr",
     "tos",
     "zos",
-    #"sos",
+    # "sos",
     "clt",
     "tasmax",
     "tasmin",

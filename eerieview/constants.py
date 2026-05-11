@@ -35,9 +35,9 @@ members_eerie_hist_cmor = [
     "ifs-nemo-er.hist-1950.v20250516.gr025.Amon",
     "HadGEM3-GC5E-LL.historical.v20250409.gr1.Amon",
     "HadGEM3-GC5E-HH.historical.v20250409.gr1.Amon",
-    #"HadGEM3-GC5-EERIE-N96-ORCA1.eerie-historical.v20250425.gr025.Amon",
-    #"HadGEM3-GC5-EERIE-N216-ORCA025.eerie-historical.v20250425.gr025.Amon",
-    #"HadGEM3-GC5-EERIE-N640-ORCA12.eerie-historical.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-historical.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-historical.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-historical.v20250425.gr025.Amon",
 ]
 
 members_eerie_future_cmor = [
@@ -46,9 +46,9 @@ members_eerie_future_cmor = [
     "ifs-nemo-er.highres-future-ssp245.v20250516.gr025.Amon",
     "HadGEM3-GC5E-LL.ssp245.v20250409.gr1.Amon",
     "HadGEM3-GC5E-HH.ssp245.v20250409.gr1.Amon",
-    #"HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon",
-    #"HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.gr025.Amon",
-    #"HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N96-ORCA1.eerie-ssp245.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N216-ORCA025.eerie-ssp245.v20250425.gr025.Amon",
+    # "HadGEM3-GC5-EERIE-N640-ORCA12.eerie-ssp245.v20250425.gr025.Amon",
 ]
 
 futuremember2hist = {
@@ -73,7 +73,7 @@ CMOR2EERIE = {
     "tasmin": "mn2t",
     "clt": "meantcc",
     "tos": "avg_tos",
-    "sos":"sos",
+    "sos": "sos",
     "zos": "avg_zos",
     "uas": "m10u",
     "vas": "m10v",

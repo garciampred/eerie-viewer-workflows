@@ -1,9 +1,8 @@
-import copy
+from dataclasses import replace
 from datetime import datetime
 from functools import reduce
 from pathlib import Path
 from typing import Callable
-from dataclasses import replace
 
 import dask
 import intake
@@ -248,16 +247,6 @@ def get_complete_input_dataset(
         dataset_future, member, rawname = get_member_dataset(
             catalogue, get_entry_dataset_fun, location, member, rawname, varname
         )
-        '''
-        # IMPORTANT: waiting for units in precipitation to be fixed in ifs-nemo future simulations!!
-        if (
-            "nemo" in member.model.lower()
-            and rawname == "pr"
-            and dataset_future[rawname].attrs["units"] == "kg m-2 s-1"
-        ):
-            dataset_future["pr"] *= 3600 * 24
-            dataset_future["pr"].attrs["units"] = "mm"
-        '''
         if "hadgem" in member.model.lower():
             member_hist = replace(member, simulation="historical")
         else:
@@ -299,7 +288,9 @@ def get_member_dataset(
         # For CmorEerieMember, kerchunk can fail with zlib/reference errors on truncated files.
         # Fall back to reading directly from disk.
         if isinstance(member, CmorEerieMember):
-            logger.warning(f"Kerchunk access failed ({type(e).__name__}: {e}), falling back to disk for {member}")
+            logger.warning(
+                f"Kerchunk access failed ({type(e).__name__}: {e}), falling back to disk for {member}"
+            )
             dataset, member, rawname = retry_get_entry_with_fixes(
                 catalogue, get_entry_dataset_fun, location, member, rawname, varname
             )
@@ -496,7 +487,6 @@ def get_model_time_series(
 
     # Define encoding options for the NetCDF variables to optimize storage.
     # Chunking is specified for better I/O performance.
-    print(f"Final dataset dimensions: {final_dataset.dims}")
     encoding_variable = dict(
         dtype="float32",
         zlib=True,

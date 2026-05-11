@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy
 import xarray
 
-from eerieview.io_utils import safe_to_zarr
 from eerieview.logger import get_logger
 
 logger = get_logger(__name__)
@@ -43,7 +42,7 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
     clim = numpy.full_like(arr, numpy.nan)
 
     # ── Step 1: 21-year rolling mean per DOY (vectorized over years) ──────
-    half = 10         # window = 2*half+1 = 21
+    half = 10  # window = 2*half+1 = 21
     min_periods = 11  # matches original decadal_window_size // 2 + 1
 
     nan_pad = numpy.full((half, *spatial_shape), numpy.nan)
@@ -72,7 +71,7 @@ def rolling_smooth_annual_cycly(da: xarray.DataArray) -> xarray.DataArray:
 
 def _fast_time_coord(da: xarray.DataArray) -> numpy.ndarray:
     """Return the time coordinate reading only the first two values.
-       Falls back to reading all values if the cadence is not strictly 1 day.
+    Falls back to reading all values if the cadence is not strictly 1 day.
     """
     import pandas
 
@@ -80,7 +79,9 @@ def _fast_time_coord(da: xarray.DataArray) -> numpy.ndarray:
     t1 = da.time[1].values
     if t1 - t0 != numpy.timedelta64(1, "D"):
         return da.time.values
-    return pandas.date_range(pandas.Timestamp(t0), periods=len(da.time), freq="D").values
+    return pandas.date_range(
+        pandas.Timestamp(t0), periods=len(da.time), freq="D"
+    ).values
 
 
 def _init_zarr_store(
@@ -92,7 +93,6 @@ def _init_zarr_store(
     thousands of empty chunk files (one per zarr chunk), each a metadata op.
     The zarr API creates only the metadata files (.zgroup, .zarray, .zattrs).
     """
-    import json
     import shutil
 
     import zarr
@@ -177,8 +177,10 @@ def write_clim_and_anom(
             block += 1
             logger.info(f"Clim+anom block {block}/{n_total}")
 
-            raw = da.isel(lat=lat_sl, lon=lon_sl).chunk({"time": -1}).compute(
-                scheduler="threads", num_workers=num_workers
+            raw = (
+                da.isel(lat=lat_sl, lon=lon_sl)
+                .chunk({"time": -1})
+                .compute(scheduler="threads", num_workers=num_workers)
             )
             clim = rolling_smooth_annual_cycly(raw)
             anom = (raw - clim).to_dataset()

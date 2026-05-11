@@ -150,7 +150,10 @@ def main():
     obsdir = Path(os.environ["OBSDIR"])
     # Define the output directory for processed time series.
     output_dir = Path(os.environ["PRODUCTSDIR"], "time_series")
-    region_set = ["IPCC", "EDDY"] # Define the default region set for spatial aggregation.
+    region_set = [
+        "IPCC",
+        "EDDY",
+    ]  # Define the default region set for spatial aggregation.
 
     # Define reference periods for different datasets.
     reference_period_era5 = (1951, 1980)
